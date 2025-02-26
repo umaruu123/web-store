@@ -1,162 +1,306 @@
 <template>
-    <header class="header">
-      <!-- 商標名稱和圖片 -->
-      <div class="brand">
-        <a href="/" class="brand-link"> <!-- 點擊後回到主頁 -->
-          <img src="" alt="Logo" class="brand-logo" /> <!-- 商業圖片 -->
-          <h1 class="brand-name">Jellycat</h1> <!-- 商標名稱 -->
-        </a>
-      </div>
-  
-      <!-- 主要內容（搜索欄、導航欄、圖標） -->
-      <div class="main-content">
-        <!-- 左邊的搜索欄 -->
-        <div class="search-bar">
+  <header class="header">
+    <!-- 商標名稱和圖片 -->
+    <div class="brand">
+      <a href="/" class="brand-link">
+        <img src="" alt="Logo" class="brand-logo" />
+        <h1 class="brand-name">Jellycat</h1>
+      </a>
+    </div>
+
+    <!-- 主要內容（漢堡選單、搜索欄、導航欄、圖標） -->
+    <div class="main-content">
+      <div class="left-group">
+        <!-- 漢堡選單按鈕 -->
+        <button class="menu-toggle" @click="menuOpen = !menuOpen">
+          ☰
+        </button>
+
+        <!-- 搜索欄 -->
+        <div class="search-container">
+          <!-- 🔍 按鈕（僅在小螢幕時顯示） -->
+          <button class="search-icon" v-if="isMobile" @click="showSearchBar = !showSearchBar">
+            🔍
+          </button>
+
+          <!-- 搜索輸入框（大螢幕時直接顯示，小螢幕點擊 🔍 後顯示） -->
           <input
             type="text"
             placeholder="Search"
             class="search-input"
             v-model="searchQuery"
             @keyup.enter="handleSearch"
+            @blur="hideSearch"
+            :class="{ 'hidden-mobile': isMobile && !showSearchBar }"
           />
         </div>
-  
-        <!-- 中間的導航欄 -->
-        <nav class="nav">
-          <ul class="nav-list">
-            <li class="nav-item"><a href="#">NEW</a></li>
-            <li class="nav-item"><a href="#">EXPLORE ALL</a></li>
-            <li class="nav-item"><a href="#">DISCOVER</a></li>
-            <li class="nav-item"><a href="#">ANIMALS</a></li>
-            <li class="nav-item"><a href="#">AMUSEABLES</a></li>
-            <li class="nav-item"><a href="#">BAGS & CHAIRS</a></li>
-            <li class="nav-item"><a href="#">BABY & BOOKS</a></li>
-            <li class="nav-item"><a href="#">PERSONALISED</a></li>
-            <li class="nav-item"><a href="#">GIFTS</a></li>
-          </ul>
-        </nav>
-  
-        <!-- 右邊的圖標 -->
-        <div class="icons">
-          <a href="#" class="icon-link">
-            <i class="fas fa-user"></i> <!-- 用戶圖標 -->
-          </a>
-          <a href="#" class="icon-link">
-            <i class="fas fa-heart"></i> <!-- 收藏圖標 -->
-          </a>
-          <a href="#" class="icon-link">
-            <i class="fas fa-shopping-cart"></i> <!-- 購物車圖標 -->
-          </a>
-        </div>
       </div>
-    </header>
-  </template>
-  
-  <script>
-  export default {
-    name: 'Header',
-    data() {
-      return {
-        searchQuery: '', // 綁定輸入框的值
-      };
+
+      <!-- 中間的導航欄 -->
+      <nav :class="['nav', { 'nav-open': menuOpen }]">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="#">NEW</a></li>
+          <li class="nav-item"><a href="#">EXPLORE ALL</a></li>
+          <li class="nav-item"><a href="#">DISCOVER</a></li>
+          <li class="nav-item"><a href="#">ANIMALS</a></li>
+          <li class="nav-item"><a href="#">AMUSEABLES</a></li>
+          <li class="nav-item"><a href="#">BAGS & CHAIRS</a></li>
+          <li class="nav-item"><a href="#">BABY & BOOKS</a></li>
+          <li class="nav-item"><a href="#">PERSONALISED</a></li>
+          <li class="nav-item"><a href="#">GIFTS</a></li>
+        </ul>
+      </nav>
+
+      <!-- 右邊的圖標 -->
+      <div class="icons">
+        <a href="#" class="icon-link">
+          <i class="fas fa-user"></i>
+        </a>
+        <a href="#" class="icon-link">
+          <i class="fas fa-heart"></i>
+        </a>
+        <a href="#" class="icon-link">
+          <i class="fas fa-shopping-cart"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+</template>
+
+<script>
+export default {
+  name: 'Header',
+  data() {
+    return {
+      searchQuery: '',
+      menuOpen: false, // 控制漢堡選單開關
+      showSearchBar: false, // 控制是否顯示搜尋框（小螢幕）
+      isMobile: window.innerWidth < 1280, // 判斷是否為小螢幕
+    };
+  },
+  methods: {
+    handleSearch() {
+      if (this.searchQuery.trim()) {
+        console.log('Searching for:', this.searchQuery);
+      }
     },
-    methods: {
-      handleSearch() {
-        if (this.searchQuery.trim()) {
-          console.log('Searching for:', this.searchQuery);
-        }
-      },
+    hideSearch() {
+      if (!this.searchQuery.trim()) {
+        this.showSearchBar = false; // 如果沒有輸入內容，則隱藏搜尋框
+      }
     },
-  };
-  </script>
-  
-  <style scoped>
-  .header {
-    background-color: #f8f8f8;
-    border-bottom: 1px solid #e7e7e7;
-    padding: 10px 20px;
-  }
-  
-  .brand {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px; /* 商標名稱與下方內容的間距 */
-  }
-  
-  .brand-link {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
-  }
-  
-  .brand-logo {
-    width: 40px; /* 圖片寬度 */
-    height: 40px; /* 圖片高度 */
-    margin-right: 10px; /* 圖片與商標名稱的間距 */
-  }
-  
-  .brand-name {
-    margin: 0;
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .main-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .search-bar {
-    display: flex;
-    align-items: center;
-  }
-  
-  .search-input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 200px;
-  }
-  
+    updateScreenSize() {
+      this.isMobile = window.innerWidth < 1280;
+    },
+  },
+  mounted() {
+    window.addEventListener('resize', this.updateScreenSize);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.updateScreenSize);
+  },
+};
+</script>
+
+<style scoped>
+.header {
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #e7e7e7;
+  padding: 10px 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.brand-name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.main-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+/* 左側組合（漢堡選單 + 搜索欄） */
+.left-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 漢堡選單按鈕 */
+.menu-toggle {
+  display: none;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+/* 搜索欄容器 */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* 搜索圖示按鈕 */
+.search-icon {
+  display: none;
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* 搜索輸入框 */
+.search-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 200px;
+  transition: width 0.3s ease;
+}
+
+/* 預設隱藏 search bar（小螢幕） */
+.hidden-mobile {
+  display: none;
+}
+
+/* 導航列表 */
+.nav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  margin: 0 10px;
+}
+
+.nav-item a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.nav-item a:hover {
+  color: #007bff;
+}
+
+/* 右側圖標 */
+.icons {
+  display: flex;
+  align-items: center;
+}
+
+.icon-link {
+  margin-left: 15px;
+  color: #333;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.icon-link:hover {
+  color: #007bff;
+}
+
+/* 📌 當螢幕介於 1280px ~ 1400px */
+@media (max-width: 1400px) {
   .nav-list {
-    list-style: none;
-    display: flex;
-    justify-content: center;
-    margin: 0;
-    padding: 0;
+    font-size: 14px; /* 縮小字體 */
+    gap: 8px; /* 增加間距 */
+    flex-wrap: wrap; /* 避免擠壓，必要時換行 */
   }
-  
+
   .nav-item {
-    margin: 0 10px;
+    margin: 4px 6px; /* 減小間距 */
   }
-  
-  .nav-item a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-  }
-  
-  .nav-item a:hover {
-    color: #007bff;
-  }
-  
+
   .icons {
-    display: flex;
-    align-items: center;
+    min-width: 120px; /* 保證右邊圖標區域不會擠壓 */
   }
-  
-  .icon-link {
-    margin-left: 15px;
-    color: #333;
-    text-decoration: none;
-    font-size: 18px;
+}
+
+
+/* 📌 1280px 以下隱藏 nav-list，顯示漢堡選單 */
+@media (max-width: 1280px) {
+  .nav {
+    display: none;
   }
-  
-  .icon-link:hover {
-    color: #007bff;
+
+  .menu-toggle {
+    display: block;
   }
-  </style>
+
+
+
+  /* 讓左側組合（漢堡選單 + 搜索）靠左 */
+  .left-group {
+    flex: 1;
+  }
+
+  /* 隱藏導航欄 */
+  .nav {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-list {
+    flex-direction: column;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .nav-item {
+    padding: 10px 0;
+  }
+
+  /* 當 menuOpen 為 true 時顯示導航欄 */
+  .nav.nav-open {
+    display: block;
+  }
+
+  /* 顯示漢堡選單按鈕 */
+  .menu-toggle {
+    display: block;
+  }
+
+  /* 讓 search bar 變成 🔍 按鈕 */
+  .search-icon {
+    display: block;
+  }
+}
+</style>
