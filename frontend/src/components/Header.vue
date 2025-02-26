@@ -104,10 +104,18 @@ export default {
 
 <style scoped>
 .header {
+  width: 100%;
+  max-width: 100vw; /* 防止超出視窗 */
   background-color: #f8f8f8;
   border-bottom: 1px solid #e7e7e7;
-  padding: 10px 20px;
+  padding: 10px 0; /* 只保留上下 padding，不影響寬度 */
+  position: fixed; /* 讓 header 固定在頂部 */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* 確保在最上層 */
 }
+
 
 .brand {
   display: flex;
@@ -141,6 +149,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   position: relative;
+  padding: 0 20px; /* 左右增加內距，讓 search bar 和 icon 不貼邊 */
 }
 
 /* 左側組合（漢堡選單 + 搜索欄） */
@@ -162,9 +171,7 @@ export default {
 
 /* 搜索欄容器 */
 .search-container {
-  position: relative;
-  display: flex;
-  align-items: center;
+  margin-left: 20px; /* 讓搜尋框不貼著邊緣 */
 }
 
 /* 搜索圖示按鈕 */
@@ -219,6 +226,8 @@ export default {
 .icons {
   display: flex;
   align-items: center;
+  gap: 15px; /* 圖標之間的間距 */
+  padding-right: 20px; /* 右邊留白 */
 }
 
 .icon-link {
