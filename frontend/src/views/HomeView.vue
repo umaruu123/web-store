@@ -1,8 +1,9 @@
 <script setup>
+import ParallaxSection from '@/components/ParallaxSection.vue';
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <ParallaxSection></ParallaxSection>
   </main>
 </template>
