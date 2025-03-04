@@ -4,7 +4,8 @@
     <div class="brand">
       <a href="/" class="brand-link">
         <img src="" alt="Logo" class="brand-logo" />
-        <h1 class="brand-name">Jellycat</h1>
+        <h1 class="brand-name">MochiPals</h1>
+
       </a>
     </div>
 
@@ -39,15 +40,11 @@
       <!-- 中間的導航欄 -->
       <nav :class="['nav', { 'nav-open': menuOpen }]">
         <ul class="nav-list">
-          <li class="nav-item"><a href="#">NEW</a></li>
+          <li class="nav-item"><a href="#">Home</a></li>
           <li class="nav-item"><a href="#">EXPLORE ALL</a></li>
-          <li class="nav-item"><a href="#">DISCOVER</a></li>
           <li class="nav-item"><a href="#">ANIMALS</a></li>
-          <li class="nav-item"><a href="#">AMUSEABLES</a></li>
           <li class="nav-item"><a href="#">BAGS & CHAIRS</a></li>
           <li class="nav-item"><a href="#">BABY & BOOKS</a></li>
-          <li class="nav-item"><a href="#">PERSONALISED</a></li>
-          <li class="nav-item"><a href="#">GIFTS</a></li>
         </ul>
       </nav>
 
