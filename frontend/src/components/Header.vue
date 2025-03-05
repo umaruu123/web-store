@@ -3,7 +3,7 @@
     <!-- 商標名稱和圖片 -->
     <div class="brand">
       <a href="/" class="brand-link">
-        <img src="" alt="Logo" class="brand-logo" />
+        <img src='/image/toyLogo.webp' alt="Logo" class="brand-logo" />
         <h1 class="brand-name">MochiPals</h1>
 
       </a>
@@ -129,9 +129,9 @@ export default {
 }
 
 .brand-logo {
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
+  width: 80px; /* 調整這個值來讓 Logo 變大 */
+  height: auto;
+  max-width: 100%;
 }
 
 .brand-name {
