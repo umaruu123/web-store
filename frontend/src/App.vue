@@ -1,7 +1,7 @@
 <script setup>
 import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
-import ProductList from './components/ProductList.vue';
+
 
 
 
@@ -10,10 +10,7 @@ import ProductList from './components/ProductList.vue';
 <template>
 <Header></Header>
 <router-view></router-view>
-<div>
-    <h1>Welcome to My Store</h1>
-    <ProductList />
-  </div>
+
 <Footer></Footer>
 </template>
 

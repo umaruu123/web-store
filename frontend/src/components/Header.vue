@@ -50,7 +50,7 @@
 
       <!-- 右邊的圖標 -->
       <div class="icons">
-        <a href="#" class="icon-link">
+        <a href="/login" class="icon-link">
           <i class="fas fa-user"></i>
         </a>
         <a href="#" class="icon-link">
