@@ -2,12 +2,13 @@
     <div class="register-container">
       <div class="register-box">
         <h2 class="register-title">New Account</h2>
-        <form @submit.prevent="validateForm" class="register-form">
+        <form @submit.prevent="registerUser" class="register-form">
+
           <!-- Email -->
           <div class="form-group">
             <label for="email">Email Address</label>
             <input type="email" id="email" v-model="form.email" />
-            <p class="error-message" v-if="errors.email">You must enter a valid email.</p>
+            <p class="error-message" v-if="errors.email">{{ errors.email }}</p>
           </div>
   
           <!-- Password -->
@@ -114,71 +115,88 @@
   </template>
   
   <script>
-  export default {
-    data() {
-      return {
-        form: {
-          email: "",
-          password: "",
-          confirmPassword: "",
-          gender: "",
-          firstName: "",
-          lastName: "",
-          address1: "",
-          address2: "",
-          city: "",
-          country: "",
-          state: "",
-          zip: "",
-          phone: "",
-        },
-        errors: {},
-        countries: [
-            "United States", "Canada", "United Kingdom", "Australia", "Japan", 
-            "China", "Germany", "France", "Italy", "India", "Malaysia", "Singapore"
-        ],
-      };
-    },
-    methods: {
-      validateForm() {
-        this.errors = {};
-  
-        // Email Validation
-        if (!this.form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email)) {
-          this.errors.email = true;
-        }
-  
-        // Password Validation
-        if (!this.form.password || this.form.password.length < 7 || !/\d/.test(this.form.password) || !/[a-zA-Z]/.test(this.form.password)) {
-          this.errors.password = true;
-        }
-  
-        // Confirm Password Validation
-        if (this.form.password !== this.form.confirmPassword) {
-          this.errors.confirmPassword = true;
-        }
-  
-        // Gender Validation
-        if (!this.form.gender) {
-          this.errors.gender = true;
-        }
-  
-        // Other Required Fields
-        const requiredFields = ["firstName", "lastName", "address1", "city", "country", "state", "zip", "phone"];
-        requiredFields.forEach((field) => {
-          if (!this.form[field]) {
-            this.errors[field] = true;
-          }
-        });
-  
-        // 如果沒有錯誤，則提交表單
-        if (Object.keys(this.errors).length === 0) {
-          alert("Form submitted successfully! 🎉");
-        }
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      form: {
+        email: "",
+        password: "",
+        confirmPassword: "",
+        gender: "",
+        firstName: "",
+        lastName: "",
+        address1: "",
+        address2: "",
+        city: "",
+        country: "",
+        state: "",
+        zip: "",
+        phone: "",
       },
+      errors: {},
+      countries: [
+        "United States", "Canada", "United Kingdom", "Australia", "Japan",
+        "China", "Germany", "France", "Italy", "India", "Malaysia", "Singapore"
+      ],
+    };
+  },
+  methods: {
+    async registerUser() {
+      this.validateForm(); // 先執行前端驗證
+      if (Object.keys(this.errors).length > 0) return; // 如果有錯誤，不發送請求
+
+      try {
+        const response = await axios.post("http://127.0.0.1:8000/api/register", this.form, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        alert(response.data.message); // 註冊成功訊息
+        this.$router.push("/login"); // 註冊成功後跳轉到登入頁面
+            } catch (error) {
+            if (error.response && error.response.data.errors) {
+            // Laravel 可能會返回多個錯誤，把它轉換成單純的錯誤訊息
+            this.errors = Object.fromEntries(
+                Object.entries(error.response.data.errors).map(([key, value]) => [key, value[0]])
+            );
+            } else {
+            alert("Something went wrong. Please try again.");
+            }
+        }
     },
-  };
-  </script>
+    validateForm() {
+      this.errors = {};
+
+      // Email 驗證
+      if (!this.form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email)) {
+        this.errors.email = true;
+      }
+
+      // 密碼驗證
+      if (!this.form.password || this.form.password.length < 7 || !/\d/.test(this.form.password) || !/[a-zA-Z]/.test(this.form.password)) {
+        this.errors.password = true;
+      }
+
+      // 確認密碼
+      if (this.form.password !== this.form.confirmPassword) {
+        this.errors.confirmPassword = true;
+      }
+
+      // 其他必填欄位
+      const requiredFields = ["gender", "firstName", "lastName", "address1", "city", "country", "state", "zip", "phone"];
+      requiredFields.forEach((field) => {
+        if (!this.form[field]) {
+          this.errors[field] = true;
+        }
+      });
+    }
+  }
+};
+</script>
+
   
   <style scoped>
   /* 主容器 */
