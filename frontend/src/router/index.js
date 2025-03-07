@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Login from '@/views/Login.vue'
+import Register from '@/views/Register.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +23,11 @@ const router = createRouter({
       path: '/login',  // ➜ 加入這個路由
       name: 'login',
       component: Login,
+    },
+    {
+      path: '/register', // ➜ 新增註冊頁面的路由
+      name: 'register',
+      component: Register,
     },
   ],
 })

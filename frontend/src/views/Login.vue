@@ -17,7 +17,7 @@
       <div class="register-box">
         <h2>New to MochiPals?</h2>
         <p>Join us today and enjoy special member-only offers!</p>
-        <button class="register-button">Create Your Account</button>
+        <router-link to="/register" class="register-button">Create Your Account</router-link>
       </div>
     </div>
   </div>
@@ -122,16 +122,20 @@ input:focus {
 
 /* 🔵 註冊按鈕 */
 .register-button {
+  text-decoration: none; /* 移除底線 */
+  display: inline-block; /* 讓按鈕樣式生效 */
+  text-align: center;
   width: 100%;
   max-width: 420px;
   padding: 14px;
-  background: linear-gradient(45deg, #92c6e0, #68a5c4); /* 漸變淺藍 */
+  background: linear-gradient(45deg, #92c6e0, #68a5c4); /* 淺藍漸變 */
   font-size: 17px;
   font-weight: bold;
   border: none;
   border-radius: 10px;
   cursor: pointer;
   transition: 0.3s;
+  color: black; /* 確保文字顏色 */
 }
 
 .register-button:hover {
