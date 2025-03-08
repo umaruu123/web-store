@@ -154,17 +154,16 @@ export default {
           },
         });
 
-        alert(response.data.message); // 註冊成功訊息
-        this.$router.push("/login"); // 註冊成功後跳轉到登入頁面
-            } catch (error) {
-            if (error.response && error.response.data.errors) {
-            // Laravel 可能會返回多個錯誤，把它轉換成單純的錯誤訊息
-            this.errors = Object.fromEntries(
-                Object.entries(error.response.data.errors).map(([key, value]) => [key, value[0]])
-            );
-            } else {
-            alert("Something went wrong. Please try again.");
-            }
+        this.$router.push({
+          path: "/account-created",
+          query: { email: this.form.email },
+        }); // 跳轉至 AccountCreated 頁面，並傳遞 email
+      } catch (error) {
+        if (error.response && error.response.data.errors) {
+          this.errors = error.response.data.errors;
+        } else {
+          alert("Something went wrong. Please try again.");
+        }
         }
     },
     validateForm() {
@@ -237,7 +236,7 @@ export default {
   }
   
   /* 單獨的輸入框 */
-  .form-group {
+  .form-group { 
     width: calc(50% - 10px);
     display: flex;
     flex-direction: column;

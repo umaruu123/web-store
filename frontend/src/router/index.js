@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
+import AccountCreated from '@/views/AccountCreated.vue' // 新增 AccountCreated.vue
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,20 +15,22 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
     {
-      path: '/login',  // ➜ 加入這個路由
+      path: '/login',
       name: 'login',
       component: Login,
     },
     {
-      path: '/register', // ➜ 新增註冊頁面的路由
+      path: '/register',
       name: 'register',
       component: Register,
+    },
+    {
+      path: '/account-created', // ➜ 新增註冊成功頁面路由
+      name: 'account-created',
+      component: AccountCreated,
     },
   ],
 })
