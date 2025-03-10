@@ -31,6 +31,9 @@ class User extends Authenticatable
         'zip',
         'country',
         'phone',
+        'verification_token', 
+        'verification_expires_at', 
+        'email_verified_at',
     ];
 
     /**

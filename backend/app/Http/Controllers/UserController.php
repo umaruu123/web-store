@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AccountVerification;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -26,6 +29,9 @@ class UserController extends Controller
             'phone' => 'required|string',
         ]);
 
+        // 生成驗證令牌
+        $verificationToken = Str::random(60);
+
         // 創建使用者
         $user = User::create([
             'email' => $request->email,
@@ -40,8 +46,31 @@ class UserController extends Controller
             'state' => $request->state,
             'zip' => $request->zip,
             'phone' => $request->phone,
+            'verification_token' => $verificationToken,
+            'verification_expires_at' => Carbon::now()->addHours(24),
         ]);
 
-        return response()->json(['message' => 'User registered successfully!'], 201);
+        // 發送驗證郵件
+        Mail::to($user->email)->send(new AccountVerification($user));
+
+        return response()->json(['message' => 'User registered successfully! Please check your email to verify your account.'], 201);
     }
+
+    public function verifyAccount($token)
+{
+    $user = User::where('verification_token', $token)
+                ->where('verification_expires_at', '>', Carbon::now())
+                ->first();
+
+    if (!$user) {
+        return response()->json(['message' => 'Invalid or expired verification token.'], 400);
+    }
+
+    $user->email_verified_at = Carbon::now();
+    $user->verification_token = null;
+    $user->verification_expires_at = null;
+    $user->save();
+
+    return redirect()->away(env('FRONTEND_URL') . '/login?verified=1');
+}
 }
