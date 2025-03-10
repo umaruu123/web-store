@@ -18,7 +18,7 @@
             <small class="password-hint">
               Passwords must be at least 7 characters and contain both alphabetic and numeric characters.
             </small>
-            <p class="error-message" v-if="errors.password">You must enter a password.</p>
+            <p class="error-message" v-if="errors.password">{{ errors.password }}</p>
           </div>
   
           <!-- Confirm Password -->
@@ -167,31 +167,37 @@ export default {
         }
     },
     validateForm() {
-      this.errors = {};
+  this.errors = {};
 
-      // Email 驗證
-      if (!this.form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email)) {
-        this.errors.email = true;
-      }
+  // Email 驗證
+  if (!this.form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email)) {
+    this.errors.email = "Please enter a valid email address.";
+  }
 
-      // 密碼驗證
-      if (!this.form.password || this.form.password.length < 7 || !/\d/.test(this.form.password) || !/[a-zA-Z]/.test(this.form.password)) {
-        this.errors.password = true;
-      }
+  // 密碼驗證
+  if (!this.form.password) {
+    this.errors.password = "You must enter a password.";
+  } else if (this.form.password.length < 7) {
+    this.errors.password = "Password must be at least 7 characters.";
+  } else if (!/\d/.test(this.form.password)) {
+    this.errors.password = "Password must contain at least one number.";
+  } else if (!/[a-zA-Z]/.test(this.form.password)) {
+    this.errors.password = "Password must contain at least one letter.";
+  }
 
-      // 確認密碼
-      if (this.form.password !== this.form.confirmPassword) {
-        this.errors.confirmPassword = true;
-      }
+  // 確認密碼
+  if (this.form.password !== this.form.confirmPassword) {
+    this.errors.confirmPassword = "Passwords do not match.";
+  }
 
-      // 其他必填欄位
-      const requiredFields = ["gender", "firstName", "lastName", "address1", "city", "country", "state", "zip", "phone"];
-      requiredFields.forEach((field) => {
-        if (!this.form[field]) {
-          this.errors[field] = true;
-        }
-      });
+  // 其他必填欄位
+  const requiredFields = ["gender", "firstName", "lastName", "address1", "city", "country", "state", "zip", "phone"];
+  requiredFields.forEach((field) => {
+    if (!this.form[field]) {
+      this.errors[field] = `Please enter your ${field.replace(/([A-Z])/g, " $1").toLowerCase()}.`;
     }
+  });
+}
   }
 };
 </script>
