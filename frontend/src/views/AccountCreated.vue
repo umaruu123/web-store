@@ -3,6 +3,7 @@
       <h2>Your account has been created</h2>
       <p>Thank you for creating your account at MochiPals.</p>
       <p>Your account details have been emailed to <strong>{{ email }}</strong></p>
+      <p>Please check your email to verify your account within 24 hours.</p>
       <router-link to="/login" class="login-link">Continue Shopping</router-link>
     </div>
   </template>

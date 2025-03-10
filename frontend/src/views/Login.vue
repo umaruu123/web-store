@@ -5,10 +5,14 @@
       <div class="login-box">
         <h2>Welcome Back!</h2>
         <p>Sign in to explore exclusive deals and your favorite products.</p>
-        <form>
-          <input type="email" placeholder="Enter your email" required />
-          <input type="password" placeholder="Enter your password" required />
-          <button class="login-button">Sign In</button>
+        <!-- 驗證成功的消息 -->
+        <div v-if="isVerified" class="verification-success">
+          Your account has been successfully verified! Please log in.
+        </div>
+        <form @submit.prevent="loginUser">
+          <input type="email" v-model="form.email" placeholder="Enter your email" required />
+          <input type="password" v-model="form.password" placeholder="Enter your password" required />
+          <button type="submit" class="login-button">Sign In</button>
         </form>
         <a href="#" class="forgot-password">Forgot your password?</a>
       </div>
@@ -22,6 +26,39 @@
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      isVerified: false, // 是否顯示驗證成功的消息
+      form: {
+        email: '',
+        password: '',
+      },
+    };
+  },
+  created() {
+    // 檢查 URL 參數 `verified`
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('verified') === '1') {
+      this.isVerified = true;
+    }
+  },
+  methods: {
+    async loginUser() {
+      try {
+        // 這裡可以添加登入邏輯，例如調用 API
+        console.log('Logging in with:', this.form);
+        // 登入成功後重定向到首頁或其他頁面
+        this.$router.push('/');
+      } catch (error) {
+        console.error('Login failed:', error);
+      }
+    },
+  },
+};
+</script>
 
 <style scoped>
 /* 🌟 主容器 */
@@ -161,5 +198,15 @@ input:focus {
     width: 100%;
     max-width: 500px;
   }
+}
+
+/* 新增驗證成功的消息樣式 */
+.verification-success {
+  background-color: #d4edda; /* 淺綠色背景 */
+  color: #155724; /* 深綠色文字 */
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 </style>
