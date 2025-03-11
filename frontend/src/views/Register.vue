@@ -144,61 +144,61 @@ export default {
   },
   methods: {
     async registerUser() {
-      this.validateForm(); // 先執行前端驗證
-      if (Object.keys(this.errors).length > 0) return; // 如果有錯誤，不發送請求
+        this.validateForm(); // 先執行前端驗證
+        if (Object.keys(this.errors).length > 0) return; // 如果有錯誤，不發送請求
 
-      try {
-        const response = await axios.post("http://127.0.0.1:8000/api/register", this.form, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        try {
+            const response = await axios.post("http://127.0.0.1:8000/api/register", this.form, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
 
-        this.$router.push({
-          path: "/account-created",
-          query: { email: this.form.email },
-        }); // 跳轉至 AccountCreated 頁面，並傳遞 email
-      } catch (error) {
-        if (error.response && error.response.data.errors) {
-          this.errors = error.response.data.errors;
-        } else {
-          alert("Something went wrong. Please try again.");
-        }
+            this.$router.push({
+                path: "/account-created",
+                query: { email: this.form.email },
+            }); // 跳轉至 AccountCreated 頁面，並傳遞 email
+        } catch (error) {
+            if (error.response && error.response.data.errors) {
+                this.errors = error.response.data.errors;
+            } else {
+                alert("Something went wrong. Please try again.");
+            }
         }
     },
     validateForm() {
-  this.errors = {};
+        this.errors = {};
 
-  // Email 驗證
-  if (!this.form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email)) {
-    this.errors.email = "Please enter a valid email address.";
-  }
+        // Email 驗證
+        if (!this.form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email)) {
+            this.errors.email = "Please enter a valid email address.";
+        }
 
-  // 密碼驗證
-  if (!this.form.password) {
-    this.errors.password = "You must enter a password.";
-  } else if (this.form.password.length < 7) {
-    this.errors.password = "Password must be at least 7 characters.";
-  } else if (!/\d/.test(this.form.password)) {
-    this.errors.password = "Password must contain at least one number.";
-  } else if (!/[a-zA-Z]/.test(this.form.password)) {
-    this.errors.password = "Password must contain at least one letter.";
-  }
+        // 密碼驗證
+        if (!this.form.password) {
+            this.errors.password = "You must enter a password.";
+        } else if (this.form.password.length < 7) {
+            this.errors.password = "Password must be at least 7 characters.";
+        } else if (!/\d/.test(this.form.password)) {
+            this.errors.password = "Password must contain at least one number.";
+        } else if (!/[a-zA-Z]/.test(this.form.password)) {
+            this.errors.password = "Password must contain at least one letter.";
+        }
 
-  // 確認密碼
-  if (this.form.password !== this.form.confirmPassword) {
-    this.errors.confirmPassword = "Passwords do not match.";
-  }
+        // 確認密碼
+        if (this.form.password !== this.form.confirmPassword) {
+            this.errors.confirmPassword = "Passwords do not match.";
+        }
 
-  // 其他必填欄位
-  const requiredFields = ["gender", "firstName", "lastName", "address1", "city", "country", "state", "zip", "phone"];
-  requiredFields.forEach((field) => {
-    if (!this.form[field]) {
-      this.errors[field] = `Please enter your ${field.replace(/([A-Z])/g, " $1").toLowerCase()}.`;
+        // 其他必填欄位
+        const requiredFields = ["gender", "firstName", "lastName", "address1", "city", "country", "state", "zip", "phone"];
+        requiredFields.forEach((field) => {
+            if (!this.form[field]) {
+                this.errors[field] = `Please enter your ${field.replace(/([A-Z])/g, " $1").toLowerCase()}.`;
+            }
+        });
     }
-  });
 }
-  }
 };
 </script>
 

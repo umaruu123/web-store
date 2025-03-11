@@ -8,6 +8,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/verify-account/{token}', [UserController::class, 'verifyAccount']);
+
 
 

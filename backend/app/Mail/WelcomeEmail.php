@@ -7,7 +7,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\User;
 
-class AccountVerification extends Mailable
+class WelcomeEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -20,10 +20,10 @@ class AccountVerification extends Mailable
 
     public function build()
     {
-        return $this->subject('Verify Your Account')
-                    ->view('emails.account_verification')
+        return $this->subject('Welcome to MochiPals!')
+                    ->view('emails.welcome_email')
                     ->with([
-                        'verificationUrl' => url("/verify-account/{$this->user->verification_token}"),
+                        'username' => $this->user->first_name, // 使用用戶的名字
                     ]);
     }
 }
