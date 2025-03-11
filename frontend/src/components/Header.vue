@@ -67,6 +67,7 @@
 
 <script>
 import { useUserStore } from '@/stores/userStore'; // 引入 Pinia Store
+import { mapState } from 'pinia'; // 引入 mapState
 
 export default {
   name: 'Header',
@@ -78,18 +79,17 @@ export default {
       isMobile: window.innerWidth < 1280, // 判斷是否為小螢幕
     };
   },
-  setup() {
-    const userStore = useUserStore();
-
+  computed: {
+    // 使用 mapState 將 Pinia Store 中的 user 狀態映射到組件
+    ...mapState(useUserStore, ['user']),
+  },
+  created() {
     // 從 localStorage 中讀取用戶信息（如果存在）
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
+      const userStore = useUserStore();
       userStore.setUser(user);
     }
-
-    return {
-      user: userStore.user, // 綁定用戶狀態
-    };
   },
   methods: {
     handleSearch() {
