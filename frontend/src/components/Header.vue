@@ -66,6 +66,8 @@
 </template>
 
 <script>
+import { useUserStore } from '@/stores/userStore'; // 引入 Pinia Store
+
 export default {
   name: 'Header',
   data() {
@@ -74,15 +76,20 @@ export default {
       menuOpen: false, // 控制漢堡選單開關
       showSearchBar: false, // 控制是否顯示搜尋框（小螢幕）
       isMobile: window.innerWidth < 1280, // 判斷是否為小螢幕
-      user: null, // 存儲用戶信息
     };
   },
-  created() {
-    // 從 localStorage 中讀取用戶信息
+  setup() {
+    const userStore = useUserStore();
+
+    // 從 localStorage 中讀取用戶信息（如果存在）
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
-      this.user = user;
+      userStore.setUser(user);
     }
+
+    return {
+      user: userStore.user, // 綁定用戶狀態
+    };
   },
   methods: {
     handleSearch() {
@@ -97,15 +104,6 @@ export default {
     },
     updateScreenSize() {
       this.isMobile = window.innerWidth < 1280;
-    },
-    logout() {
-      // 清除 localStorage 中的用戶信息
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      this.user = null;
-
-      // 重定向到登入頁面
-      this.$router.push('/login');
     },
   },
   mounted() {
@@ -252,20 +250,6 @@ export default {
 }
 
 .icon-link:hover {
-  color: #007bff;
-}
-
-/* 登出按鈕 */
-.logout-button {
-  background: none;
-  border: none;
-  color: #333;
-  font-size: 16px;
-  cursor: pointer;
-  margin-left: 15px;
-}
-
-.logout-button:hover {
   color: #007bff;
 }
 

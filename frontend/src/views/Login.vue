@@ -27,6 +27,7 @@
 
 <script>
 import axios from 'axios'; // 引入 axios
+import { useUserStore } from '@/stores/userStore'; // 引入 Pinia Store
 
 export default {
   data() {
@@ -51,6 +52,9 @@ export default {
         localStorage.setItem('authToken', token);
         localStorage.setItem('user', JSON.stringify(user));
 
+        // 更新 Pinia Store 中的用戶信息
+        const userStore = useUserStore();
+        userStore.setUser(user);
 
         // 登入成功後重定向到首頁
         this.$router.push('/');
