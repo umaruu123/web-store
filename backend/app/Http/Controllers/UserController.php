@@ -49,5 +49,37 @@ class UserController extends Controller
         return response()->json(['message' => 'User registered successfully! A welcome email has been sent.'], 201);
     }
 
+    // UserController.php
+        public function login(Request $request)
+        {
+            // 驗證請求資料
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
+
+            // 檢查用戶是否存在
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                return response()->json(['message' => 'Email not found'], 404);
+            }
+
+            // 檢查密碼是否正確
+            if (!Hash::check($request->password, $user->password)) {
+                return response()->json(['message' => 'Incorrect password'], 401);
+            }
+
+            // 生成 Token（這裡使用 Laravel Sanctum 或 Passport）
+            $token = $user->createToken('authToken')->plainTextToken;
+
+            // 返回 Token 和用戶信息
+            return response()->json([
+                'message' => 'Login successful',
+                'token' => $token,
+                'user' => $user,
+            ], 200);
+        }
+
 
 }

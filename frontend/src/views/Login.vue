@@ -5,15 +5,13 @@
       <div class="login-box">
         <h2>Welcome Back!</h2>
         <p>Sign in to explore exclusive deals and your favorite products.</p>
-        <!-- 驗證成功的消息 -->
-        <div v-if="isVerified" class="verification-success">
-          Your account has been successfully verified! Please log in.
-        </div>
         <form @submit.prevent="loginUser">
           <input type="email" v-model="form.email" placeholder="Enter your email" required />
           <input type="password" v-model="form.password" placeholder="Enter your password" required />
           <button type="submit" class="login-button">Sign In</button>
         </form>
+        <!-- 顯示錯誤訊息 -->
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         <a href="#" class="forgot-password">Forgot your password?</a>
       </div>
 
@@ -28,31 +26,42 @@
 </template>
 
 <script>
+import axios from 'axios'; // 引入 axios
+
 export default {
   data() {
     return {
-      isVerified: false, // 是否顯示驗證成功的消息
       form: {
         email: '',
         password: '',
       },
+      errorMessage: '', // 用於顯示錯誤訊息
     };
-  },
-  created() {
-    // 檢查 URL 參數 `verified`
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('verified') === '1') {
-      this.isVerified = true;
-    }
   },
   methods: {
     async loginUser() {
       try {
-        // 這裡可以添加登入邏輯，例如調用 API
-        console.log('Logging in with:', this.form);
-        // 登入成功後重定向到首頁或其他頁面
+        // 發送登入請求到後端 API
+        const response = await axios.post('http://127.0.0.1:8000/api/login', this.form);
+
+        // 從響應中獲取 Token 和用戶信息
+        const { token, user } = response.data;
+
+        // 將 Token 存儲到 localStorage
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('user', JSON.stringify(user));
+
+
+        // 登入成功後重定向到首頁
         this.$router.push('/');
       } catch (error) {
+        // 處理錯誤
+        if (error.response) {
+          // 後端返回的錯誤訊息
+          this.errorMessage = error.response.data.message || 'Login failed. Please try again.';
+        } else {
+          this.errorMessage = 'Network error. Please check your connection.';
+        }
         console.error('Login failed:', error);
       }
     },
@@ -208,5 +217,11 @@ input:focus {
   border-radius: 5px;
   margin-bottom: 20px;
   text-align: center;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
 }
 </style>
