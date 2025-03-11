@@ -3,9 +3,8 @@
     <!-- 商標名稱和圖片 -->
     <div class="brand">
       <a href="/" class="brand-link">
-        <img src='/image/toyLogo.webp' alt="Logo" class="brand-logo" />
+        <img src="/image/toyLogo.webp" alt="Logo" class="brand-logo" />
         <h1 class="brand-name">MochiPals</h1>
-
       </a>
     </div>
 
@@ -13,16 +12,12 @@
     <div class="main-content">
       <div class="left-group">
         <!-- 漢堡選單按鈕 -->
-        <button class="menu-toggle" @click="menuOpen = !menuOpen">
-          ☰
-        </button>
+        <button class="menu-toggle" @click="menuOpen = !menuOpen">☰</button>
 
         <!-- 搜索欄 -->
         <div class="search-container">
           <!-- 🔍 按鈕（僅在小螢幕時顯示） -->
-          <button class="search-icon" v-if="isMobile" @click="showSearchBar = !showSearchBar">
-            🔍
-          </button>
+          <button class="search-icon" v-if="isMobile" @click="showSearchBar = !showSearchBar">🔍</button>
 
           <!-- 搜索輸入框（大螢幕時直接顯示，小螢幕點擊 🔍 後顯示） -->
           <input
@@ -50,9 +45,15 @@
 
       <!-- 右邊的圖標 -->
       <div class="icons">
-        <a href="/login" class="icon-link">
+        <!-- 用戶圖標：根據登入狀態顯示不同內容 -->
+        <router-link v-if="user" to="/account" class="icon-link">
           <i class="fas fa-user"></i>
-        </a>
+        </router-link>
+        <router-link v-else to="/login" class="icon-link">
+          <i class="fas fa-user"></i>
+        </router-link>
+
+        <!-- 其他圖標 -->
         <a href="#" class="icon-link">
           <i class="fas fa-heart"></i>
         </a>
@@ -73,7 +74,15 @@ export default {
       menuOpen: false, // 控制漢堡選單開關
       showSearchBar: false, // 控制是否顯示搜尋框（小螢幕）
       isMobile: window.innerWidth < 1280, // 判斷是否為小螢幕
+      user: null, // 存儲用戶信息
     };
+  },
+  created() {
+    // 從 localStorage 中讀取用戶信息
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      this.user = user;
+    }
   },
   methods: {
     handleSearch() {
@@ -88,6 +97,15 @@ export default {
     },
     updateScreenSize() {
       this.isMobile = window.innerWidth < 1280;
+    },
+    logout() {
+      // 清除 localStorage 中的用戶信息
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      this.user = null;
+
+      // 重定向到登入頁面
+      this.$router.push('/login');
     },
   },
   mounted() {
@@ -112,7 +130,6 @@ export default {
   right: 0;
   z-index: 1000; /* 確保在最上層 */
 }
-
 
 .brand {
   display: flex;
@@ -238,6 +255,20 @@ export default {
   color: #007bff;
 }
 
+/* 登出按鈕 */
+.logout-button {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 15px;
+}
+
+.logout-button:hover {
+  color: #007bff;
+}
+
 /* 📌 當螢幕介於 1280px ~ 1400px */
 @media (max-width: 1400px) {
   .nav-list {
@@ -255,7 +286,6 @@ export default {
   }
 }
 
-
 /* 📌 1280px 以下隱藏 nav-list，顯示漢堡選單 */
 @media (max-width: 1280px) {
   .nav {
@@ -265,8 +295,6 @@ export default {
   .menu-toggle {
     display: block;
   }
-
-
 
   /* 讓左側組合（漢堡選單 + 搜索）靠左 */
   .left-group {

@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
 import AccountCreated from '@/views/AccountCreated.vue' // 新增 AccountCreated.vue
+import AccountDetails from '@/views/AccountDetails.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +32,11 @@ const router = createRouter({
       path: '/account-created', // ➜ 新增註冊成功頁面路由
       name: 'account-created',
       component: AccountCreated,
+    },
+    {
+      path: '/account',
+      name: 'Account',
+      component: AccountDetails,
     },
   ],
 })
