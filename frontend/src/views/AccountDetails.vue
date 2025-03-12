@@ -3,37 +3,52 @@
     <AccountNavigation title="Account Details" />
     <div v-if="loading">Loading...</div>
     <div v-else>
-      <!-- 顯示用戶信息 -->
-      <div class="user-info">
-        <h2>User Information</h2>
-        <p><strong>Name:</strong> {{ user.name }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Phone:</strong> {{ user.phone }}</p>
-      </div>
-
       <!-- 編輯用戶信息的表單 -->
-      <div class="edit-form" v-if="isEditing">
-        <h2>Edit Information</h2>
+      <div class="edit-form">
         <form @submit.prevent="saveChanges">
-          <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" id="name" v-model="editUser.name" />
+          <div class="form-columns">
+            <!-- 左列 -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" v-model="editUser.first_name" />
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" v-model="editUser.last_name" />
+              </div>
+              <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" v-model="editUser.email" />
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input type="tel" id="phone" v-model="editUser.phone" />
+              </div>
+            </div>
+
+            <!-- 右列 -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="currentPassword">Current Password:</label>
+                <input type="password" id="currentPassword" v-model="editUser.currentPassword" />
+              </div>
+              <div class="form-group">
+                <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" v-model="editUser.newPassword" />
+                <p class="password-hint">Passwords must be at least 7 characters and contain both alphabetic and numeric characters.</p>
+              </div>
+              <div class="form-group">
+                <label for="confirmNewPassword">Confirm New Password:</label>
+                <input type="password" id="confirmNewPassword" v-model="editUser.confirmNewPassword" />
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" v-model="editUser.email" />
-          </div>
-          <div class="form-group">
-            <label for="phone">Phone:</label>
-            <input type="tel" id="phone" v-model="editUser.phone" />
-          </div>
-          <button type="submit">Save Changes</button>
-          <button type="button" @click="cancelEdit">Cancel</button>
+
+          <!-- 提交按鈕 -->
+          <button type="submit">Update Details</button>
         </form>
       </div>
-
-      <!-- 編輯按鈕 -->
-      <button v-if="!isEditing" @click="startEdit">Edit Information</button>
     </div>
   </div>
 </template>
@@ -48,17 +63,15 @@ export default {
   },
   data() {
     return {
-      user: {
-        name: '',
-        email: '',
-        phone: '',
-      },
       editUser: {
-        name: '',
+        first_name: '',
+        last_name: '',
         email: '',
         phone: '',
+        currentPassword: '', // 當前密碼
+        newPassword: '', // 新密碼
+        confirmNewPassword: '', // 確認新密碼
       },
-      isEditing: false, // 是否正在編輯
       loading: true, // 是否正在加載數據
     };
   },
@@ -67,33 +80,62 @@ export default {
     async fetchUserDetails() {
       try {
         const response = await api.getUserDetails(); // 假設 API 中有 getUserDetails 方法
-        this.user = response.data;
+        this.editUser = {
+          first_name: response.data.first_name,
+          last_name: response.data.last_name,
+          email: response.data.email,
+          phone: response.data.phone,
+          currentPassword: '',
+          newPassword: '',
+          confirmNewPassword: '',
+        };
         this.loading = false;
       } catch (error) {
         console.error('Failed to fetch user details:', error);
         this.loading = false;
       }
     },
-    // 開始編輯
-    startEdit() {
-      this.editUser = { ...this.user }; // 複製當前用戶信息到編輯表單
-      this.isEditing = true;
-    },
-    // 取消編輯
-    cancelEdit() {
-      this.isEditing = false;
-    },
     // 保存更改
     async saveChanges() {
-      try {
-        await api.updateUserDetails(this.editUser); // 假設 API 中有 updateUserDetails 方法
-        this.user = { ...this.editUser }; // 更新用戶信息
-        this.isEditing = false;
-        alert('Information updated successfully!');
-      } catch (error) {
-        console.error('Failed to update user details:', error);
-        alert('Failed to update information. Please try again.');
+      if (this.editUser.newPassword !== this.editUser.confirmNewPassword) {
+        alert('New password and confirm password do not match.');
+        return;
       }
+
+      // 檢查新密碼是否符合要求
+      if (this.editUser.newPassword && !this.isPasswordValid(this.editUser.newPassword)) {
+        alert('Password must be at least 7 characters and contain both alphabetic and numeric characters.');
+        return;
+      }
+
+      try {
+        // 更新用戶信息
+        await api.updateUserDetails({
+          first_name: this.editUser.first_name,
+          last_name: this.editUser.last_name,
+          email: this.editUser.email,
+          phone: this.editUser.phone,
+        });
+
+        // 如果用戶輸入了新密碼，則更改密碼
+        if (this.editUser.newPassword) {
+          await api.changePassword({
+            currentPassword: this.editUser.currentPassword,
+            newPassword: this.editUser.newPassword,
+          });
+        }
+
+        alert('Details updated successfully!');
+      } catch (error) {
+        console.error('Failed to update details:', error);
+        alert('Failed to update details. Please try again.');
+      }
+    },
+    // 檢查密碼是否符合要求
+    isPasswordValid(password) {
+      const hasLetter = /[a-zA-Z]/.test(password); // 檢查是否包含字母
+      const hasNumber = /[0-9]/.test(password); // 檢查是否包含數字
+      return password.length >= 7 && hasLetter && hasNumber;
     },
   },
   mounted() {
@@ -108,38 +150,64 @@ export default {
   padding: 20px;
 }
 
-.user-info {
-  margin-bottom: 20px;
-}
-
 .edit-form {
   margin-top: 20px;
 }
 
+.form-columns {
+  display: flex;
+  justify-content: space-between;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-column {
+  flex: 1;
+  padding: 0 20px; /* 增加列之間的間距 */
+}
+
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px; /* 增加表單組之間的間距 */
+  text-align: left; /* 讓標籤和輸入框左對齊 */
 }
 
 label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 8px; /* 標籤與輸入框之間的間距 */
+  font-weight: bold; /* 讓標籤文字加粗 */
+  font-size: 14px; /* 調整標籤文字大小 */
 }
 
 input {
-  padding: 8px;
-  width: 100%;
-  max-width: 300px;
-  margin-bottom: 10px;
+  padding: 12px; /* 增加輸入框的內邊距 */
+  width: 100%; /* 輸入框寬度填滿父容器 */
+  max-width: 400px; /* 增加輸入框的最大寬度 */
+  font-size: 14px; /* 調整輸入框文字大小 */
+  border: 1px solid #ccc; /* 添加邊框 */
+  border-radius: 5px; /* 圓角邊框 */
+  box-sizing: border-box; /* 確保 padding 不會影響寬度 */
+}
+
+input:focus {
+  border-color: #007bff; /* 聚焦時邊框顏色 */
+  outline: none; /* 移除默認的聚焦外框 */
+}
+
+.password-hint {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #666;
 }
 
 button {
-  padding: 10px 20px;
-  margin-right: 10px;
+  padding: 12px 24px;
+  margin-top: 20px;
   cursor: pointer;
   background-color: #007bff;
   color: white;
   border: none;
   border-radius: 5px;
+  font-size: 16px;
   transition: background-color 0.3s ease;
 }
 

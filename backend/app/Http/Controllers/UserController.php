@@ -80,6 +80,52 @@ class UserController extends Controller
                 'user' => $user,
             ], 200);
         }
+        public function getUserDetails(Request $request)
+        {
+            // 獲取當前登錄用戶
+            $user = $request->user();
+
+            // 返回用戶信息
+            return response()->json([
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+            ]);
+        }
+        public function updateUserDetails(Request $request)
+        {
+            $request->validate([
+                'first_name' => 'required|string',
+                'last_name' => 'required|string',
+                'email' => 'required|email',
+                'phone' => 'required|string',
+            ]);
+
+            $user = $request->user();
+            $user->update($request->only(['first_name', 'last_name', 'email', 'phone']));
+
+            return response()->json(['message' => 'User details updated successfully!']);
+        }
+
+        public function changePassword(Request $request)
+        {
+            $request->validate([
+                'currentPassword' => 'required',
+                'newPassword' => 'required|min:7|regex:/[a-zA-Z]/|regex:/[0-9]/',
+            ]);
+
+            $user = $request->user();
+
+            if (!Hash::check($request->currentPassword, $user->password)) {
+                return response()->json(['message' => 'Current password is incorrect'], 401);
+            }
+
+            $user->password = Hash::make($request->newPassword);
+            $user->save();
+
+            return response()->json(['message' => 'Password changed successfully!']);
+        }
 
 
 }

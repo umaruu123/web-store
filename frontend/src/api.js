@@ -47,4 +47,7 @@ export default {
   updateUserDetails(data) {
     return api.put('/user/details', data); // 假設後端有對應的 API 端點
   },
+  changePassword(data) {
+    return api.post('/user/change-password', data); // 假設後端有對應的 API 端點
+  },
 };
