@@ -46,7 +46,7 @@
       <!-- 右邊的圖標 -->
       <div class="icons">
         <!-- 用戶圖標：根據登入狀態顯示不同內容 -->
-        <router-link v-if="user" to="/account" class="icon-link">
+        <router-link v-if="user" to="/account/details" class="icon-link">
           <i class="fas fa-user"></i>
         </router-link>
         <router-link v-else to="/login" class="icon-link">

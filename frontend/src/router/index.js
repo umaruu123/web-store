@@ -4,6 +4,10 @@ import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
 import AccountCreated from '@/views/AccountCreated.vue' // 新增 AccountCreated.vue
 import AccountDetails from '@/views/AccountDetails.vue';
+import Orders from '@/views/Orders.vue';
+import Addresses from '@/views/Addresses.vue';
+import Wishlists from '@/views/Wishlists.vue';
+import RecentlyViewed from '@/views/RecentlyViewed.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,9 +38,29 @@ const router = createRouter({
       component: AccountCreated,
     },
     {
-      path: '/account',
-      name: 'Account',
+      path: '/account/details', // 路徑可以根據需求調整
+      name: 'AccountDetails', // 路由名稱
       component: AccountDetails,
+    },
+    {
+      path: '/account/orders',
+      name: 'Orders',
+      component: Orders,
+    },
+    {
+      path: '/account/addresses',
+      name: 'Addresses',
+      component: Addresses,
+    },
+    {
+      path: '/account/wishlists',
+      name: 'Wishlists',
+      component: Wishlists,
+    },
+    {
+      path: '/account/recently-viewed',
+      name: 'RecentlyViewed',
+      component: RecentlyViewed,
     },
   ],
 })
