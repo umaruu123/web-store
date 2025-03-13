@@ -50,4 +50,10 @@ export default {
   changePassword(data) {
     return api.post('/user/change-password', data); // 假設後端有對應的 API 端點
   },
+  getAddresses() {
+    return api.get('/addresses'); // 獲取地址信息
+  },
+  updateAddress(data) {
+    return api.put('/user/update-address', data); // 調用新的地址更新 API
+  },
 };

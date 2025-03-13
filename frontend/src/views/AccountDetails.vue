@@ -56,81 +56,92 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue';
+import { useUserStore } from '@/stores/userStore'; // 引入 Pinia Store
 import AccountNavigation from '@/components/AccountNavigation.vue';
-import api from '@/api'; // 引入 API 方法
+import api from '@/api';
 
 export default {
   components: {
     AccountNavigation,
   },
-  data() {
-    return {
-      editUser: {
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: '',
-        currentPassword: '', // 當前密碼
-        newPassword: '', // 新密碼
-        confirmNewPassword: '', // 確認新密碼
-      },
-      loading: true, // 是否正在加載數據
-      passwordError: '', // 密碼格式錯誤提示
-      passwordMismatchError: '', // 密碼不匹配錯誤提示
-    };
-  },
-  methods: {
-    // 獲取用戶信息
-    async fetchUserDetails() {
+  setup() {
+    const userStore = useUserStore();
+    const editUser = ref({
+      first_name: '',
+      last_name: '',
+      email: '',
+      phone: '',
+      currentPassword: '',
+      newPassword: '',
+      confirmNewPassword: '',
+    });
+    const loading = ref(true);
+    const passwordError = ref('');
+    const passwordMismatchError = ref('');
+
+    // 從 Pinia Store 中獲取用戶信息
+    const fetchUserDetails = async () => {
       try {
-        const response = await api.getUserDetails(); // 假設 API 中有 getUserDetails 方法
-        this.editUser = {
-          first_name: response.data.first_name,
-          last_name: response.data.last_name,
-          email: response.data.email,
-          phone: response.data.phone,
-          currentPassword: '',
-          newPassword: '',
-          confirmNewPassword: '',
-        };
-        this.loading = false;
+        if (userStore.user) {
+          // 如果 Pinia Store 中有用戶信息，直接使用
+          editUser.value = {
+            first_name: userStore.user.first_name,
+            last_name: userStore.user.last_name,
+            email: userStore.user.email,
+            phone: userStore.user.phone,
+            currentPassword: '',
+            newPassword: '',
+            confirmNewPassword: '',
+          };
+        } else {
+          // 如果 Pinia Store 中沒有用戶信息，從 API 獲取
+          const response = await api.getUserDetails();
+          editUser.value = {
+            first_name: response.data.first_name,
+            last_name: response.data.last_name,
+            email: response.data.email,
+            phone: response.data.phone,
+            currentPassword: '',
+            newPassword: '',
+            confirmNewPassword: '',
+          };
+        }
       } catch (error) {
         console.error('Failed to fetch user details:', error);
-        this.loading = false;
+      } finally {
+        loading.value = false;
       }
-    },
+    };
+
     // 保存更改
-    async saveChanges() {
-      // 檢查密碼是否匹配
-      if (this.editUser.newPassword !== this.editUser.confirmNewPassword) {
-        this.passwordMismatchError = 'New password and confirm password do not match.';
+    const saveChanges = async () => {
+      if (editUser.value.newPassword !== editUser.value.confirmNewPassword) {
+        passwordMismatchError.value = 'New password and confirm password do not match.';
         return;
       } else {
-        this.passwordMismatchError = ''; // 清空錯誤提示
+        passwordMismatchError.value = '';
       }
 
-      // 檢查新密碼是否符合要求
-      if (this.editUser.newPassword && !this.isPasswordValid(this.editUser.newPassword)) {
-        this.passwordError = 'Password must be at least 7 characters and contain both alphabetic and numeric characters.';
+      if (editUser.value.newPassword && !isPasswordValid(editUser.value.newPassword)) {
+        passwordError.value = 'Password must be at least 7 characters and contain both alphabetic and numeric characters.';
         return;
       } else {
-        this.passwordError = ''; // 清空錯誤提示
+        passwordError.value = '';
       }
 
       try {
-        // 更新用戶信息
         await api.updateUserDetails({
-          first_name: this.editUser.first_name,
-          last_name: this.editUser.last_name,
-          email: this.editUser.email,
-          phone: this.editUser.phone,
+          first_name: editUser.value.first_name,
+          last_name: editUser.value.last_name,
+          email: editUser.value.email,
+          phone: editUser.value.phone,
         });
 
-        // 如果用戶輸入了新密碼，則更改密碼
-        if (this.editUser.newPassword) {
+        if (editUser.value.newPassword) {
           await api.changePassword({
-            currentPassword: this.editUser.currentPassword,
-            newPassword: this.editUser.newPassword,
+            currentPassword: editUser.value.currentPassword,
+            newPassword: editUser.value.newPassword,
           });
         }
 
@@ -139,16 +150,26 @@ export default {
         console.error('Failed to update details:', error);
         alert('Failed to update details. Please try again.');
       }
-    },
+    };
+
     // 檢查密碼是否符合要求
-    isPasswordValid(password) {
-      const hasLetter = /[a-zA-Z]/.test(password); // 檢查是否包含字母
-      const hasNumber = /[0-9]/.test(password); // 檢查是否包含數字
+    const isPasswordValid = (password) => {
+      const hasLetter = /[a-zA-Z]/.test(password);
+      const hasNumber = /[0-9]/.test(password);
       return password.length >= 7 && hasLetter && hasNumber;
-    },
-  },
-  mounted() {
-    this.fetchUserDetails(); // 組件加載時獲取用戶信息
+    };
+
+    onMounted(() => {
+      fetchUserDetails();
+    });
+
+    return {
+      editUser,
+      loading,
+      passwordError,
+      passwordMismatchError,
+      saveChanges,
+    };
   },
 };
 </script>

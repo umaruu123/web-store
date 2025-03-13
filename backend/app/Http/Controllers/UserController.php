@@ -127,5 +127,48 @@ class UserController extends Controller
             return response()->json(['message' => 'Password changed successfully!']);
         }
 
+        public function getAddresses(Request $request)
+        {
+            $user = $request->user();
+            return response()->json([
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'address1' => $user->address1,
+                'city' => $user->city,
+                'state' => $user->state,
+                'zip' => $user->zip,
+                'country' => $user->country,
+                'phone' => $user->phone,
+            ]);
+        }
+
+        public function updateAddress(Request $request)
+        {
+            $request->validate([
+                'first_name' => 'required|string',
+                'last_name' => 'required|string',
+                'address1' => 'required|string',
+                'city' => 'required|string',
+                'state' => 'required|string',
+                'zip' => 'required|string',
+                'country' => 'required|string',
+                'phone' => 'required|string',
+            ]);
+
+            $user = $request->user();
+            $user->update($request->only([
+                'first_name',
+                'last_name',
+                'address1',
+                'city',
+                'state',
+                'zip',
+                'country',
+                'phone',
+            ]));
+
+            return response()->json(['message' => 'Address updated successfully!']);
+        }
+
 
 }

@@ -12,4 +12,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/details', [UserController::class, 'getUserDetails']); // 獲取用戶信息
     Route::put('/user/details', [UserController::class, 'updateUserDetails']); // 更新用戶信息
     Route::post('/user/change-password', [UserController::class, 'changePassword']); // 更改密碼
+    Route::get('/addresses', [UserController::class, 'getAddresses']); // 獲取地址信息
+    Route::put('/user/update-address', [UserController::class, 'updateAddress']); // 新增地址更新路由
 });
