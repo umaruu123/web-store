@@ -37,10 +37,12 @@
                 <label for="newPassword">New Password:</label>
                 <input type="password" id="newPassword" v-model="editUser.newPassword" />
                 <p class="password-hint">Passwords must be at least 7 characters and contain both alphabetic and numeric characters.</p>
+                <p v-if="passwordError" class="password-error">{{ passwordError }}</p>
               </div>
               <div class="form-group">
                 <label for="confirmNewPassword">Confirm New Password:</label>
                 <input type="password" id="confirmNewPassword" v-model="editUser.confirmNewPassword" />
+                <p v-if="passwordMismatchError" class="password-error">{{ passwordMismatchError }}</p>
               </div>
             </div>
           </div>
@@ -73,6 +75,8 @@ export default {
         confirmNewPassword: '', // 確認新密碼
       },
       loading: true, // 是否正在加載數據
+      passwordError: '', // 密碼格式錯誤提示
+      passwordMismatchError: '', // 密碼不匹配錯誤提示
     };
   },
   methods: {
@@ -97,15 +101,20 @@ export default {
     },
     // 保存更改
     async saveChanges() {
+      // 檢查密碼是否匹配
       if (this.editUser.newPassword !== this.editUser.confirmNewPassword) {
-        alert('New password and confirm password do not match.');
+        this.passwordMismatchError = 'New password and confirm password do not match.';
         return;
+      } else {
+        this.passwordMismatchError = ''; // 清空錯誤提示
       }
 
       // 檢查新密碼是否符合要求
       if (this.editUser.newPassword && !this.isPasswordValid(this.editUser.newPassword)) {
-        alert('Password must be at least 7 characters and contain both alphabetic and numeric characters.');
+        this.passwordError = 'Password must be at least 7 characters and contain both alphabetic and numeric characters.';
         return;
+      } else {
+        this.passwordError = ''; // 清空錯誤提示
       }
 
       try {
@@ -197,6 +206,12 @@ input:focus {
   margin-top: 5px;
   font-size: 12px;
   color: #666;
+}
+
+.password-error {
+  margin-top: 5px;
+  font-size: 12px;
+  color: red; /* 紅色錯誤提示 */
 }
 
 button {
