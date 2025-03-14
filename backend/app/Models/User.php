@@ -32,6 +32,7 @@ class User extends Authenticatable
         'country',
         'phone',
         'email_verified_at',
+        'role',
     ];
 
     /**

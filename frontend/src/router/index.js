@@ -8,6 +8,10 @@ import Orders from '@/views/Orders.vue';
 import Addresses from '@/views/Addresses.vue';
 import Wishlists from '@/views/Wishlists.vue';
 import RecentlyViewed from '@/views/RecentlyViewed.vue';
+import AdminDashboard from '@/views/AdminDashboard.vue';
+import AdminUsers from '@/views/AdminUsers.vue';
+import AdminOrders from '@/views/AdminOrders.vue';
+import AdminProducts from '@/views/AdminProducts.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -61,6 +65,16 @@ const router = createRouter({
       path: '/account/recently-viewed',
       name: 'RecentlyViewed',
       component: RecentlyViewed,
+    },
+    {
+      path: '/admin',
+      component: AdminDashboard,
+      meta: { hideHeader: true }, // 添加元信息
+      children: [
+        { path: 'users', component: AdminUsers },
+        { path: 'orders', component: AdminOrders },
+        { path: 'products', component: AdminProducts },
+      ],
     },
   ],
 })

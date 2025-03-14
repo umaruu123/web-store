@@ -46,7 +46,7 @@ export default {
         const response = await axios.post('http://127.0.0.1:8000/api/login', this.form);
 
         // 從響應中獲取 Token 和用戶信息
-        const { token, user } = response.data;
+        const { token, user, role } = response.data;
 
         // 將 Token 存儲到 localStorage
         localStorage.setItem('authToken', token);
@@ -66,8 +66,12 @@ export default {
           phone: user.phone,
         });
 
-        // 登入成功後重定向到首頁
-        this.$router.push('/');
+        // 根據角色跳轉到不同頁面
+        if (role === 'admin') {
+          this.$router.push('/admin'); // 跳轉到 Admin Dashboard
+        } else {
+          this.$router.push('/'); // 跳轉到用戶首頁
+        }
       } catch (error) {
         // 處理錯誤
         if (error.response) {

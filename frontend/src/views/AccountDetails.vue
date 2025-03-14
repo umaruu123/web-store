@@ -58,6 +58,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore'; // 引入 Pinia Store
+import { useRouter } from 'vue-router'; // 引入 useRouter
 import AccountNavigation from '@/components/AccountNavigation.vue';
 import api from '@/api';
 
@@ -67,6 +68,7 @@ export default {
   },
   setup() {
     const userStore = useUserStore();
+    const router = useRouter();
     const editUser = ref({
       first_name: '',
       last_name: '',
@@ -79,6 +81,13 @@ export default {
     const loading = ref(true);
     const passwordError = ref('');
     const passwordMismatchError = ref('');
+
+    // 檢查用戶是否已登錄
+    const checkAuth = () => {
+      if (!userStore.user) {
+        router.push('/login'); // 未登錄則重定向到登錄頁面
+      }
+    };
 
     // 從 Pinia Store 中獲取用戶信息
     const fetchUserDetails = async () => {
@@ -159,7 +168,10 @@ export default {
       return password.length >= 7 && hasLetter && hasNumber;
     };
 
+    
+
     onMounted(() => {
+      checkAuth(); // 檢查用戶是否已登錄
       fetchUserDetails();
     });
 

@@ -42,6 +42,7 @@ class UserController extends Controller
             'state' => $request->state,
             'zip' => $request->zip,
             'phone' => $request->phone,
+            'role' => 'user', // 默認角色為 user
         ]);
 
         Mail::to($user->email)->send(new WelcomeEmail($user));
@@ -78,6 +79,7 @@ class UserController extends Controller
                 'message' => 'Login successful',
                 'token' => $token,
                 'user' => $user,
+                'role' => $user->role,
             ], 200);
         }
         public function getUserDetails(Request $request)
