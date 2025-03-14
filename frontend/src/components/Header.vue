@@ -83,14 +83,6 @@ export default {
     // 使用 mapState 將 Pinia Store 中的 user 狀態映射到組件
     ...mapState(useUserStore, ['user']),
   },
-  created() {
-    // 從 localStorage 中讀取用戶信息（如果存在）
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      const userStore = useUserStore();
-      userStore.setUser(user);
-    }
-  },
   methods: {
     handleSearch() {
       if (this.searchQuery.trim()) {

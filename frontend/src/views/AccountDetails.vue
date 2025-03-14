@@ -84,6 +84,7 @@ export default {
 
     // 檢查用戶是否已登錄
     const checkAuth = () => {
+      const userStore = useUserStore();
       if (!userStore.user) {
         router.push('/login'); // 未登錄則重定向到登錄頁面
       }
