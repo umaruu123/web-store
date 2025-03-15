@@ -68,7 +68,7 @@ export default {
 
         // 根據角色跳轉到不同頁面
         if (role === 'admin') {
-          this.$router.push('/admin'); // 跳轉到 Admin Dashboard
+          this.$router.push('/admin/users'); // 跳轉到 Admin Dashboard
         } else {
           this.$router.push('/'); // 跳轉到用戶首頁
         }

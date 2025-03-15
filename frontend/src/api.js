@@ -41,25 +41,55 @@ export default {
   getRecentlyViewed() {
     return api.get('/recently-viewed');
   },
-  addToCart(itemId) {
-    return api.post('/cart', { itemId });
-  },
   addToWishlist(itemId) {
     return api.post('/wishlist', { itemId });
   },
   getUserDetails() {
-    return api.get('/user/details'); // 假設後端有對應的 API 端點
+    return api.get('/user/details');
   },
   updateUserDetails(data) {
-    return api.put('/user/details', data); // 假設後端有對應的 API 端點
+    return api.put('/user/details', data);
   },
   changePassword(data) {
-    return api.post('/user/change-password', data); // 假設後端有對應的 API 端點
-  },
-  getAddresses() {
-    return api.get('/addresses'); // 獲取地址信息
+    return api.post('/user/change-password', data);
   },
   updateAddress(data) {
-    return api.put('/user/update-address', data); // 調用新的地址更新 API
+    return api.put('/user/update-address', data);
   },
+  // 獲取所有用戶
+  getUsers() {
+    return api.get('/admin/users');
+  },
+  // 刪除用戶
+  deleteUser(userId) {
+    return api.delete(`/admin/users/${userId}`);
+  },
+  updateUserByAdmin(userId, data) {
+    return api.put(`/admin/users/${userId}`, data);
+  },
+  // 獲取所有產品
+  getProducts() {
+    return api.get('/admin/products');
+  },
+  // 添加產品
+  addProduct(data) {
+    return api.post('/admin/products', data);
+  },
+  // 更新產品
+  updateProduct(productId, data) {
+    return api.put(`/admin/products/${productId}`, data);
+  },
+  // 刪除產品
+  deleteProduct(productId) {
+    return api.delete(`/admin/products/${productId}`);
+  },
+  // 獲取所有訂單
+  getAdminOrders() {
+    return api.get('/admin/orders');
+  },
+  // 更新訂單狀態
+  updateOrderStatus(orderId, status) {
+    return api.put(`/admin/orders/${orderId}/status`, { status });
+  },
+  
 };

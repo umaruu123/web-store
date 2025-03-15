@@ -1,77 +1,93 @@
 <template>
-    <div class="admin-products">
-      <h2>Product Management</h2>
-      <button class="add-product-button" @click="addProduct">Add Product</button>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="product in products" :key="product.id">
-            <td>{{ product.id }}</td>
-            <td>{{ product.name }}</td>
-            <td>${{ product.price }}</td>
-            <td>{{ product.stock }}</td>
-            <td>
-              <button @click="editProduct(product)">Edit</button>
-              <button @click="deleteProduct(product)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        products: [
-          { id: 1, name: 'Product A', price: 50, stock: 100 },
-          { id: 2, name: 'Product B', price: 30, stock: 200 },
-          { id: 3, name: 'Product C', price: 20, stock: 150 },
-        ],
-      };
+  <div class="admin-products">
+    <h2>Product Management</h2>
+    <button class="add-product-button" @click="addProduct">Add Product</button>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="product in products" :key="product.id">
+          <td>{{ product.id }}</td>
+          <td>{{ product.name }}</td>
+          <td>${{ product.price }}</td>
+          <td>{{ product.stock }}</td>
+          <td>
+            <button @click="editProduct(product)">Edit</button>
+            <button @click="deleteProduct(product)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<script>
+import api from '@/api'; // 引入 API 方法
+
+export default {
+  data() {
+    return {
+      products: [],
+      loading: true,
+      error: null,
+    };
+  },
+  async created() {
+    await this.fetchProducts();
+  },
+  methods: {
+    async fetchProducts() {
+      try {
+        const response = await api.getProducts();
+        this.products = response.data;
+      } catch (error) {
+        this.error = 'Failed to fetch products.';
+        console.error('Error fetching products:', error);
+      } finally {
+        this.loading = false;
+      }
     },
-    methods: {
-      addProduct() {
-        const name = prompt('Enter product name:');
-        const price = parseFloat(prompt('Enter product price:'));
-        const stock = parseInt(prompt('Enter product stock:'));
-        if (name && price && stock) {
-          this.products.push({
-            id: this.products.length + 1,
-            name,
-            price,
-            stock,
-          });
+    async addProduct() {
+      const name = prompt('Enter product name:');
+      const price = parseFloat(prompt('Enter product price:'));
+      const stock = parseInt(prompt('Enter product stock:'));
+      if (name && price && stock) {
+        try {
+          const response = await api.addProduct({ name, price, stock });
+          this.products.push(response.data);
           alert('Product added successfully!');
+        } catch (error) {
+          alert('Failed to add product.');
+          console.error('Error adding product:', error);
         }
-      },
-      editProduct(product) {
-        const name = prompt('Enter new name:', product.name);
-        const price = parseFloat(prompt('Enter new price:', product.price));
-        const stock = parseInt(prompt('Enter new stock:', product.stock));
-        if (name && price && stock) {
-          product.name = name;
-          product.price = price;
-          product.stock = stock;
-          alert('Product updated successfully!');
-        }
-      },
-      deleteProduct(product) {
-        this.products = this.products.filter((p) => p.id !== product.id);
-        alert('Product deleted successfully!');
-      },
+      }
     },
-  };
-  </script>
+    async deleteProduct(product) {
+      if (confirm(`Are you sure you want to delete ${product.name}?`)) {
+        try {
+          await api.deleteProduct(product.id);
+          this.products = this.products.filter((p) => p.id !== product.id);
+          alert('Product deleted successfully!');
+        } catch (error) {
+          alert('Failed to delete product.');
+          console.error('Error deleting product:', error);
+        }
+      }
+    },
+    editProduct(product) {
+      alert(`Edit product: ${product.name}`);
+      // 這裡可以跳轉到編輯頁面
+    },
+  },
+};
+</script>
   
   <style scoped>
   .admin-products {

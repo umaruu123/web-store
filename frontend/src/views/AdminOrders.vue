@@ -1,61 +1,82 @@
 <template>
-    <div class="admin-orders">
-      <h2>Order Management</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Date</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="order in orders" :key="order.id">
-            <td>{{ order.id }}</td>
-            <td>{{ order.customer }}</td>
-            <td>{{ order.date }}</td>
-            <td>${{ order.total }}</td>
-            <td>
-              <span :class="`status-${order.status}`">{{ order.status }}</span>
-            </td>
-            <td>
-              <button @click="viewOrder(order)">View</button>
-              <button @click="updateOrderStatus(order)">Update Status</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        orders: [
-          { id: 1, customer: 'John Doe', date: '2023-10-01', total: 120, status: 'Shipped' },
-          { id: 2, customer: 'Jane Smith', date: '2023-10-02', total: 200, status: 'Pending' },
-          { id: 3, customer: 'Alice Johnson', date: '2023-10-03', total: 80, status: 'Delivered' },
-        ],
-      };
+  <div class="admin-orders">
+    <h2>Order Management</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="order in orders" :key="order.id">
+          <td>{{ order.id }}</td>
+          <td>{{ order.customer }}</td>
+          <td>{{ order.date }}</td>
+          <td>${{ order.total }}</td>
+          <td>
+            <span :class="`status-${order.status}`">{{ order.status }}</span>
+          </td>
+          <td>
+            <button @click="viewOrder(order)">View</button>
+            <button @click="updateOrderStatus(order)">Update Status</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<script>
+import api from '@/api'; // 引入 API 方法
+
+export default {
+  data() {
+    return {
+      orders: [],
+      loading: true,
+      error: null,
+    };
+  },
+  async created() {
+    await this.fetchOrders();
+  },
+  methods: {
+    async fetchOrders() {
+      try {
+        const response = await api.getOrders();
+        this.orders = response.data;
+      } catch (error) {
+        this.error = 'Failed to fetch orders.';
+        console.error('Error fetching orders:', error);
+      } finally {
+        this.loading = false;
+      }
     },
-    methods: {
-      viewOrder(order) {
-        alert(`View order: ${order.id}`);
-      },
-      updateOrderStatus(order) {
-        const newStatus = prompt('Enter new status:', order.status);
-        if (newStatus) {
+    async updateOrderStatus(order) {
+      const newStatus = prompt('Enter new status:', order.status);
+      if (newStatus) {
+        try {
+          await api.updateOrderStatus(order.id, newStatus);
           order.status = newStatus;
           alert(`Order ${order.id} status updated to ${newStatus}`);
+        } catch (error) {
+          alert('Failed to update order status.');
+          console.error('Error updating order status:', error);
         }
-      },
+      }
     },
-  };
-  </script>
+    viewOrder(order) {
+      alert(`View order: ${order.id}`);
+      // 這裡可以跳轉到訂單詳情頁面
+    },
+  },
+};
+</script>
   
   <style scoped>
   .admin-orders {
