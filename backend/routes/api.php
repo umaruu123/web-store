@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 
 // 這裡放所有 API 路由
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('products/{product}/details', [ProductController::class, 'showDetails']);
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
@@ -19,4 +20,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/users', [AdminController::class, 'getAllUsers']);
     Route::put('/admin/users/{userId}', [AdminController::class, 'updateUserByAdmin']);
     Route::delete('/admin/users/{userId}', [AdminController::class, 'deleteUserByAdmin']);
+    // 新增管理員產品路由
+    Route::get('/admin/products', [ProductController::class, 'index']);
+    Route::post('/admin/products', [ProductController::class, 'store']);
+    Route::put('/admin/products/{product}', [ProductController::class, 'update']);
+    Route::delete('/admin/products/{product}', [ProductController::class, 'destroy']);
 });
