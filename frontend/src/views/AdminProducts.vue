@@ -2,7 +2,10 @@
   <div class="admin-products">
     <div class="header">
       <h2>Product Management</h2>
-      <button class="add-product-button" @click="openAddForm">Add Product</button>
+      <div class="header-buttons">
+        <button class="add-product-button" @click="openAddForm">Add Product</button>
+        <button class="add-category-button" @click="openAddCategoryForm">Add Category</button>
+      </div>
     </div>
 
     <table>
@@ -12,6 +15,9 @@
           <th>Name</th>
           <th>Price</th>
           <th>Stock</th>
+          <th>Category</th>
+          <th>SKU</th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -19,8 +25,11 @@
         <tr v-for="product in products" :key="product.id">
           <td>{{ product.id }}</td>
           <td>{{ product.name }}</td>
-          <td>${{ product.price }}</td>
+          <td>${{ typeof product.price === 'number' ? product.price.toFixed(2) : product.price }}</td>
           <td>{{ product.stock }}</td>
+          <td>{{ product.category ? product.category.name : 'No Category' }}</td>
+          <td>{{ product.sku }}</td>
+          <td>{{ product.status }}</td>
           <td>
             <button @click="openEditForm(product)">Edit</button>
             <button @click="deleteProduct(product)">Delete</button>
@@ -29,7 +38,35 @@
       </tbody>
     </table>
 
-    <!-- 編輯產品表單 -->
+    <!-- 類別列表 -->
+    <div class="category-list">
+      <h3>Categories</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Slug</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="category in categories" :key="category.id">
+            <td>{{ category.id }}</td>
+            <td>{{ category.name }}</td>
+            <td>{{ category.slug }}</td>
+            <td>{{ category.description }}</td>
+            <td>
+              <button @click="openEditCategoryForm(category)">Edit</button>
+              <button @click="deleteCategory(category)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Edit Product Form -->
     <div v-if="showEditForm" class="form-overlay" @click="closeForm">
       <div class="form-container" @click.stop>
         <h2 class="form-title">Edit Product</h2>
@@ -50,6 +87,7 @@
             <label for="edit-price">Price</label>
             <input
               type="number"
+              step="0.01"
               id="edit-price"
               v-model="editProductData.price"
               :class="{ 'invalid': !editProductData.price && formSubmitted }"
@@ -70,6 +108,67 @@
             <span v-if="!editProductData.stock && formSubmitted" class="error-message">Stock is required</span>
           </div>
 
+          <div class="form-group">
+            <label for="edit-category">Category</label>
+            <select
+              id="edit-category"
+              v-model="editProductData.category_id"
+              :class="{ 'invalid': !editProductData.category_id && formSubmitted }"
+            >
+              <option value="">Select a category</option>
+              <option v-for="category in categories" :key="category.id" :value="category.id">
+                {{ category.name }}
+              </option>
+            </select>
+            <span v-if="!editProductData.category_id && formSubmitted" class="error-message">Category is required</span>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-sku">SKU</label>
+            <input
+              type="text"
+              id="edit-sku"
+              v-model="editProductData.sku"
+              :class="{ 'invalid': !editProductData.sku && formSubmitted }"
+              placeholder="Enter product SKU"
+            />
+            <span v-if="!editProductData.sku && formSubmitted" class="error-message">SKU is required</span>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-status">Status</label>
+            <select
+              id="edit-status"
+              v-model="editProductData.status"
+              :class="{ 'invalid': !editProductData.status && formSubmitted }"
+            >
+              <option value="">Select a status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="out_of_stock">Out of Stock</option>
+            </select>
+            <span v-if="!editProductData.status && formSubmitted" class="error-message">Status is required</span>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-image">Image URL</label>
+            <input
+              type="url"
+              id="edit-image"
+              v-model="editProductData.image_url"
+              placeholder="Enter image URL"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-description">Description</label>
+            <textarea
+              id="edit-description"
+              v-model="editProductData.description"
+              placeholder="Enter product description"
+            ></textarea>
+          </div>
+
           <div class="form-actions">
             <button type="submit" class="submit-button">Save Changes</button>
             <button type="button" class="cancel-button" @click="closeForm">Cancel</button>
@@ -78,7 +177,7 @@
       </div>
     </div>
 
-    <!-- 新增產品表單 -->
+    <!-- Add Product Form -->
     <div v-if="showAddForm" class="form-overlay" @click="closeAddForm">
       <div class="form-container" @click.stop>
         <h2 class="form-title">Add Product</h2>
@@ -99,6 +198,7 @@
             <label for="add-price">Price</label>
             <input
               type="number"
+              step="0.01"
               id="add-price"
               v-model="newProduct.price"
               :class="{ 'invalid': !newProduct.price && addFormSubmitted }"
@@ -119,9 +219,148 @@
             <span v-if="!newProduct.stock && addFormSubmitted" class="error-message">Stock is required</span>
           </div>
 
+          <div class="form-group">
+            <label for="add-category">Category</label>
+            <select
+              id="add-category"
+              v-model="newProduct.category_id"
+              :class="{ 'invalid': !newProduct.category_id && addFormSubmitted }"
+            >
+              <option value="">Select a category</option>
+              <option v-for="category in categories" :key="category.id" :value="category.id">
+                {{ category.name }}
+              </option>
+            </select>
+            <span v-if="!newProduct.category_id && addFormSubmitted" class="error-message">Category is required</span>
+          </div>
+
+          <div class="form-group">
+            <label for="add-sku">SKU</label>
+            <input
+              type="text"
+              id="add-sku"
+              v-model="newProduct.sku"
+              :class="{ 'invalid': !newProduct.sku && addFormSubmitted }"
+              placeholder="Enter product SKU"
+            />
+            <span v-if="!newProduct.sku && addFormSubmitted" class="error-message">SKU is required</span>
+          </div>
+
+          <div class="form-group">
+            <label for="add-status">Status</label>
+            <select
+              id="add-status"
+              v-model="newProduct.status"
+              :class="{ 'invalid': !newProduct.status && addFormSubmitted }"
+            >
+              <option value="">Select a status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="out_of_stock">Out of Stock</option>
+            </select>
+            <span v-if="!newProduct.status && addFormSubmitted" class="error-message">Status is required</span>
+          </div>
+
+          <div class="form-group">
+            <label for="add-image">Image URL</label>
+            <input
+              type="url"
+              id="add-image"
+              v-model="newProduct.image_url"
+              placeholder="Enter image URL"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="add-description">Description</label>
+            <textarea
+              id="add-description"
+              v-model="newProduct.description"
+              placeholder="Enter product description"
+            ></textarea>
+          </div>
+
           <div class="form-actions">
             <button type="submit" class="submit-button">Add Product</button>
             <button type="button" class="cancel-button" @click="closeAddForm">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Category Form -->
+    <div v-if="showAddCategoryForm" class="form-overlay" @click="closeAddCategoryForm">
+      <div class="form-container" @click.stop>
+        <h2 class="form-title">Add Category</h2>
+        <form @submit.prevent="addCategory">
+          <div class="form-group">
+            <label for="add-category-name">Category Name</label>
+            <input
+              type="text"
+              id="add-category-name"
+              v-model="newCategory.name"
+              placeholder="Enter category name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="add-category-slug">Slug</label>
+            <input
+              type="text"
+              id="add-category-slug"
+              v-model="newCategory.slug"
+              placeholder="Enter category slug"
+            />
+          </div>
+          <div class="form-group">
+            <label for="add-category-description">Description</label>
+            <textarea
+              id="add-category-description"
+              v-model="newCategory.description"
+              placeholder="Enter category description"
+            ></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="submit-button">Add Category</button>
+            <button type="button" class="cancel-button" @click="closeAddCategoryForm">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 編輯類別表單 -->
+    <div v-if="showEditCategoryForm" class="form-overlay" @click="closeEditCategoryForm">
+      <div class="form-container" @click.stop>
+        <h2 class="form-title">Edit Category</h2>
+        <form @submit.prevent="updateCategory">
+          <div class="form-group">
+            <label for="edit-category-name">Category Name</label>
+            <input
+              type="text"
+              id="edit-category-name"
+              v-model="editCategoryData.name"
+              placeholder="Enter category name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="edit-category-slug">Slug</label>
+            <input
+              type="text"
+              id="edit-category-slug"
+              v-model="editCategoryData.slug"
+              placeholder="Enter category slug"
+            />
+          </div>
+          <div class="form-group">
+            <label for="edit-category-description">Description</label>
+            <textarea
+              id="edit-category-description"
+              v-model="editCategoryData.description"
+              placeholder="Enter category description"
+            ></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="submit-button">Save Changes</button>
+            <button type="button" class="cancel-button" @click="closeEditCategoryForm">Cancel</button>
           </div>
         </form>
       </div>
@@ -130,39 +369,68 @@
 </template>
 
 <script>
-import api from '@/api'; // 引入 API 方法
+import api from '@/api'; // 導入 API 方法
 
 export default {
   data() {
     return {
-      products: [],
-      loading: true,
-      error: null,
-      showEditForm: false,
-      showAddForm: false,
-      formSubmitted: false, // 用於編輯表單驗證
-      addFormSubmitted: false, // 用於新增表單驗證
+      products: [], // 產品列表
+      categories: [], // 類別列表
+      loading: true, // 加載狀態
+      error: null, // 錯誤訊息
+      showEditForm: false, // 控制編輯產品表單的顯示
+      showAddForm: false, // 控制添加產品表單的顯示
+      showAddCategoryForm: false, // 控制添加類別表單的顯示
+      showEditCategoryForm: false, // 控制編輯類別表單的顯示
+      formSubmitted: false, // 表單提交狀態
+      addFormSubmitted: false, // 添加表單提交狀態
       editProductData: {
         id: null,
         name: '',
         price: '',
         stock: '',
+        category_id: '',
+        sku: '',
+        status: '',
+        image_url: '',
+        description: '',
       },
       newProduct: {
         name: '',
         price: '',
         stock: '',
+        category_id: '',
+        sku: '',
+        status: '',
+        image_url: '',
+        description: '',
+      },
+      newCategory: {
+        name: '',
+        slug: '',
+        description: '',
+      },
+      editCategoryData: {
+        id: null,
+        name: '',
+        slug: '',
+        description: '',
       },
     };
   },
   async created() {
-    await this.fetchProducts();
+    await this.fetchProducts(); // 獲取產品資料
+    await this.fetchCategories(); // 獲取類別資料
   },
   methods: {
+    // 獲取產品列表
     async fetchProducts() {
       try {
         const response = await api.getProducts();
-        this.products = response.data;
+        this.products = response.data.map(product => ({
+          ...product,
+          price: parseFloat(product.price), // 將價格轉為數字
+        }));
       } catch (error) {
         this.error = 'Failed to fetch products.';
         console.error('Error fetching products:', error);
@@ -170,17 +438,36 @@ export default {
         this.loading = false;
       }
     },
-    async addProduct() {
-      this.addFormSubmitted = true; // 標記表單已提交
 
-      // 檢查所有欄位是否已填寫
-      if (!this.newProduct.name || !this.newProduct.price || !this.newProduct.stock) {
-        return; // 如果有欄位為空，停止提交
+    // 獲取類別列表
+    async fetchCategories() {
+      try {
+        const response = await api.getCategories();
+        this.categories = response.data;
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    },
+
+    // 添加產品
+    async addProduct() {
+      this.addFormSubmitted = true;
+
+      // 驗證所有必填字段
+      if (
+        !this.newProduct.name ||
+        !this.newProduct.price ||
+        !this.newProduct.stock ||
+        !this.newProduct.category_id ||
+        !this.newProduct.sku ||
+        !this.newProduct.status
+      ) {
+        return;
       }
 
       try {
-        const response = await api.addProduct(this.newProduct);
-        this.products.push(response.data);
+        await api.addProduct(this.newProduct);
+        await this.fetchProducts(); // 重新獲取產品資料以確保一致性
         this.closeAddForm(); // 關閉表單
         alert('Product added successfully!');
       } catch (error) {
@@ -188,11 +475,26 @@ export default {
         console.error('Error adding product:', error);
       }
     },
+
+    // 添加類別
+    async addCategory() {
+      try {
+        await api.addCategory(this.newCategory);
+        await this.fetchCategories(); // 重新獲取類別資料以確保一致性
+        this.closeAddCategoryForm(); // 關閉表單
+        alert('Category added successfully!');
+      } catch (error) {
+        alert('Failed to add category.');
+        console.error('Error adding category:', error);
+      }
+    },
+
+    // 刪除產品
     async deleteProduct(product) {
       if (confirm(`Are you sure you want to delete ${product.name}?`)) {
         try {
           await api.deleteProduct(product.id);
-          this.products = this.products.filter((p) => p.id !== product.id);
+          await this.fetchProducts(); // 重新獲取產品資料以確保一致性
           alert('Product deleted successfully!');
         } catch (error) {
           alert('Failed to delete product.');
@@ -200,31 +502,63 @@ export default {
         }
       }
     },
+
+    // 刪除類別
+    async deleteCategory(category) {
+      if (confirm(`Are you sure you want to delete ${category.name}?`)) {
+        try {
+          await api.deleteCategory(category.id);
+          await this.fetchCategories(); // 重新獲取類別資料以確保一致性
+          alert('Category deleted successfully!');
+        } catch (error) {
+          alert('Failed to delete category.');
+          console.error('Error deleting category:', error);
+        }
+      }
+    },
+
+    // 打開編輯產品表單
     openEditForm(product) {
       this.editProductData = { ...product }; // 填充當前產品數據
       this.showEditForm = true; // 打開編輯表單
     },
+
+    // 關閉編輯產品表單
     closeForm() {
-      this.showEditForm = false; // 關閉編輯表單
-      this.formSubmitted = false; // 重置表單提交狀態
-      this.editProductData = { // 重置表單數據
+      this.showEditForm = false;
+      this.formSubmitted = false;
+      this.editProductData = {
         id: null,
         name: '',
         price: '',
         stock: '',
+        category_id: '',
+        sku: '',
+        status: '',
+        image_url: '',
+        description: '',
       };
     },
-    async updateProduct() {
-      this.formSubmitted = true; // 標記表單已提交
 
-      // 檢查所有欄位是否已填寫
-      if (!this.editProductData.name || !this.editProductData.price || !this.editProductData.stock) {
-        return; // 如果有欄位為空，停止提交
+    // 更新產品
+    async updateProduct() {
+      this.formSubmitted = true;
+
+      // 驗證所有必填字段
+      if (
+        !this.editProductData.name ||
+        !this.editProductData.price ||
+        !this.editProductData.stock ||
+        !this.editProductData.category_id ||
+        !this.editProductData.sku ||
+        !this.editProductData.status
+      ) {
+        return;
       }
 
       try {
         await api.updateProduct(this.editProductData.id, this.editProductData);
-        this.fetchProducts(); // 重新獲取產品列表
+        await this.fetchProducts(); // 重新獲取產品資料以確保一致性
         this.closeForm(); // 關閉表單
         alert('Product updated successfully!');
       } catch (error) {
@@ -232,17 +566,71 @@ export default {
         console.error('Error updating product:', error);
       }
     },
+
+    // 打開添加產品表單
     openAddForm() {
-      this.showAddForm = true; // 打開新增表單
+      this.showAddForm = true;
     },
+
+    // 關閉添加產品表單
     closeAddForm() {
-      this.showAddForm = false; // 關閉新增表單
-      this.addFormSubmitted = false; // 重置表單提交狀態
-      this.newProduct = { // 重置表單數據
+      this.showAddForm = false;
+      this.addFormSubmitted = false;
+      this.newProduct = {
         name: '',
         price: '',
         stock: '',
+        category_id: '',
+        sku: '',
+        status: '',
+        image_url: '',
+        description: '',
       };
+    },
+
+    // 打開添加類別表單
+    openAddCategoryForm() {
+      this.showAddCategoryForm = true;
+    },
+
+    // 關閉添加類別表單
+    closeAddCategoryForm() {
+      this.showAddCategoryForm = false;
+      this.newCategory = {
+        name: '',
+        slug: '',
+        description: '',
+      };
+    },
+
+    // 打開編輯類別表單
+    openEditCategoryForm(category) {
+      this.editCategoryData = { ...category }; // 填充當前類別數據
+      this.showEditCategoryForm = true; // 打開編輯表單
+    },
+
+    // 關閉編輯類別表單
+    closeEditCategoryForm() {
+      this.showEditCategoryForm = false;
+      this.editCategoryData = {
+        id: null,
+        name: '',
+        slug: '',
+        description: '',
+      };
+    },
+
+    // 更新類別
+    async updateCategory() {
+      try {
+        await api.updateCategory(this.editCategoryData.id, this.editCategoryData);
+        await this.fetchCategories(); // 重新獲取類別資料以確保一致性
+        this.closeEditCategoryForm(); // 關閉表單
+        alert('Category updated successfully!');
+      } catch (error) {
+        alert('Failed to update category.');
+        console.error('Error updating category:', error);
+      }
     },
   },
 };
@@ -270,7 +658,13 @@ export default {
   color: #333;
 }
 
-.add-product-button {
+.header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.add-product-button,
+.add-category-button {
   padding: 10px 20px;
   background: linear-gradient(135deg, #28a745, #218838);
   color: white;
@@ -282,7 +676,8 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.add-product-button:hover {
+.add-product-button:hover,
+.add-category-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -342,6 +737,16 @@ button:active {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .form-container {
@@ -350,7 +755,19 @@ button:active {
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .form-title {
@@ -372,7 +789,9 @@ label {
   color: #555;
 }
 
-input {
+input,
+select,
+textarea {
   width: 100%;
   padding: 12px;
   border: 1px solid #ddd;
@@ -382,14 +801,18 @@ input {
   background-color: #f9f9f9;
 }
 
-input:focus {
+input:focus,
+select:focus,
+textarea:focus {
   border-color: #007bff;
   box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
   outline: none;
   background-color: #fff;
 }
 
-input.invalid {
+input.invalid,
+select.invalid,
+textarea.invalid {
   border-color: #ff4d4d;
 }
 

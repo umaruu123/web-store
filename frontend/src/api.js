@@ -71,12 +71,16 @@ export default {
   getProducts() {
     return api.get('/admin/products');
   },
+  // 獲取所有類別
+  getCategories() {
+    return api.get('/categories');
+  },
   // 添加產品
   addProduct(data) {
     return api.post('/admin/products', data);
   },
   // 更新產品
-  updateProduct(productId, data) {
+  updateProduct(productId, data) {  
     return api.put(`/admin/products/${productId}`, data);
   },
   // 刪除產品
@@ -91,5 +95,15 @@ export default {
   updateOrderStatus(orderId, status) {
     return api.put(`/admin/orders/${orderId}/status`, { status });
   },
-  
+  // 刪除類別
+  deleteCategory(categoryId) {
+    return api.delete(`/admin/categories/${categoryId}`);
+  },
+  addCategory(data) {
+    return api.post('/admin/categories', data); // 確保路徑和後端一致
+  },
+  updateCategory(categoryId, data) {
+    return api.put(`/admin/categories/${categoryId}`, data); // 確保路徑和後端一致
+  },
+
 };

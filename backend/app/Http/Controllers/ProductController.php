@@ -13,7 +13,7 @@ class ProductController extends Controller
      */
     public function index(): JsonResponse
     {
-        $products = Product::all();
+        $products = Product::with('category')->get(); // 加載關聯的類別
         return response()->json($products);
     }
 
@@ -31,22 +31,19 @@ class ProductController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        // 驗證請求資料
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
-            'description' => 'nullable|string',
-            'image_url' => 'nullable|url',
             'stock' => 'required|integer',
-            'category_id' => 'nullable|exists:categories,id',
-            'status' => 'required|in:active,inactive,out_of_stock',
+            'category_id' => 'required|exists:categories,id', // 確保類別存在
             'sku' => 'required|string|unique:products,sku',
+            'status' => 'required|in:active,inactive,out_of_stock',
+            'image_url' => 'nullable|url',
+            'description' => 'nullable|string',
         ]);
 
-        // 創建產品
         $product = Product::create($validatedData);
-
-        return response()->json($product, 201); // 201 表示資源創建成功
+        return response()->json($product, 201);
     }
 
     /**
@@ -71,21 +68,18 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product): JsonResponse
     {
-        // 驗證請求資料
         $validatedData = $request->validate([
             'name' => 'sometimes|string|max:255',
             'price' => 'sometimes|numeric',
-            'description' => 'nullable|string',
-            'image_url' => 'nullable|url',
             'stock' => 'sometimes|integer',
-            'category_id' => 'nullable|exists:categories,id',
-            'status' => 'sometimes|in:active,inactive,out_of_stock',
+            'category_id' => 'sometimes|exists:categories,id', // 確保類別存在
             'sku' => 'sometimes|string|unique:products,sku,' . $product->id,
+            'status' => 'sometimes|in:active,inactive,out_of_stock',
+            'image_url' => 'nullable|url',
+            'description' => 'nullable|string',
         ]);
 
-        // 更新產品
         $product->update($validatedData);
-
         return response()->json($product);
     }
 
