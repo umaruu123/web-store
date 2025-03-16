@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // 管理員相關路由
     Route::get('/admin/users', [AdminController::class, 'getAllUsers']);
+    Route::post('/admin/users', [AdminController::class, 'addUser']); // 新增用戶
     Route::put('/admin/users/{userId}', [AdminController::class, 'updateUserByAdmin']);
     Route::delete('/admin/users/{userId}', [AdminController::class, 'deleteUserByAdmin']);
 

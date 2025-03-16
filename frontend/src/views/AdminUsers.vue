@@ -76,6 +76,34 @@
                 <span v-if="!editUser.email && formSubmitted" class="error-message">Email is required</span>
               </div>
 
+              <!-- Password -->
+              <div class="form-group">
+                <label for="edit-password">New Password (optional)</label>
+                <input
+                  type="password"
+                  id="edit-password"
+                  v-model="editUser.password"
+                  placeholder="Enter new password"
+                />
+                <span v-if="editUser.password && !isPasswordValid(editUser.password)" class="error-message">
+                  Password must be at least 7 characters and contain both letters and numbers.
+                </span>
+              </div>
+
+              <!-- Confirm Password -->
+              <div class="form-group">
+                <label for="edit-confirm-password">Confirm Password</label>
+                <input
+                  type="password"
+                  id="edit-confirm-password"
+                  v-model="editUser.confirmPassword"
+                  placeholder="Confirm new password"
+                />
+                <span v-if="editUser.password && editUser.confirmPassword && !isPasswordMatch(editUser.password, editUser.confirmPassword)" class="error-message">
+                  Passwords do not match.
+                </span>
+              </div>
+
               <!-- Role -->
               <div class="form-group">
                 <label for="role">Role</label>
@@ -226,10 +254,43 @@
                   type="email"
                   id="add-email"
                   v-model="newUser.email"
-                  :class="{ 'invalid': !newUser.email && addFormSubmitted }"
+                  :class="{ 'invalid': (!newUser.email && addFormSubmitted) || emailExists }"
                   placeholder="Enter email"
                 />
                 <span v-if="!newUser.email && addFormSubmitted" class="error-message">Email is required</span>
+                <span v-if="emailExists" class="error-message">Email already exists.</span>
+              </div>
+
+              <!-- Password -->
+              <div class="form-group">
+                <label for="add-password">Password</label>
+                <input
+                  type="password"
+                  id="add-password"
+                  v-model="newUser.password"
+                  :class="{ 'invalid': !newUser.password && addFormSubmitted }"
+                  placeholder="Enter password"
+                />
+                <span v-if="!newUser.password && addFormSubmitted" class="error-message">Password is required</span>
+                <span v-if="newUser.password && !isPasswordValid(newUser.password)" class="error-message">
+                  Password must be at least 7 characters and contain both letters and numbers.
+                </span>
+              </div>
+
+              <!-- Confirm Password -->
+              <div class="form-group">
+                <label for="add-confirm-password">Confirm Password</label>
+                <input
+                  type="password"
+                  id="add-confirm-password"
+                  v-model="newUser.confirmPassword"
+                  :class="{ 'invalid': !newUser.confirmPassword && addFormSubmitted }"
+                  placeholder="Confirm password"
+                />
+                <span v-if="!newUser.confirmPassword && addFormSubmitted" class="error-message">Confirm Password is required</span>
+                <span v-if="newUser.password && newUser.confirmPassword && !isPasswordMatch(newUser.password, newUser.confirmPassword)" class="error-message">
+                  Passwords do not match.
+                </span>
               </div>
 
               <!-- Role -->
@@ -356,11 +417,14 @@ export default {
       showAddForm: false,
       formSubmitted: false, // 用於編輯表單驗證
       addFormSubmitted: false, // 用於新增表單驗證
+      emailExists: false, // 用於檢查 Email 是否已存在
       editUser: {
         id: null,
         first_name: '',
         last_name: '',
         email: '',
+        password: '', // 可選，用於修改密碼
+        confirmPassword: '', // 確認密碼
         role: 'user',
         phone: '',
         address1: '',
@@ -373,6 +437,8 @@ export default {
         first_name: '',
         last_name: '',
         email: '',
+        password: '', // 新增密碼欄位
+        confirmPassword: '', // 確認密碼
         role: 'user',
         phone: '',
         address1: '',
@@ -398,13 +464,14 @@ export default {
     };
   },
   async created() {
-    await this.fetchUsers();
+    await this.fetchUsers(); // 組件創建時獲取用戶資料
   },
   methods: {
+    // 獲取所有用戶
     async fetchUsers() {
       try {
         const response = await api.getUsers();
-        this.users = response.data;
+        this.users = response.data; // 更新本地用戶資料
       } catch (error) {
         this.error = 'Failed to fetch users.';
         console.error('Error fetching users:', error);
@@ -412,11 +479,13 @@ export default {
         this.loading = false;
       }
     },
+
+    // 刪除用戶
     async deleteUser(user) {
       if (confirm(`Are you sure you want to delete ${user.first_name} ${user.last_name}?`)) {
         try {
           await api.deleteUser(user.id);
-          this.users = this.users.filter((u) => u.id !== user.id);
+          await this.fetchUsers(); // 刪除後重新獲取用戶資料
           alert('User deleted successfully!');
         } catch (error) {
           alert('Failed to delete user.');
@@ -424,10 +493,14 @@ export default {
         }
       }
     },
+
+    // 打開編輯用戶表單
     openEditForm(user) {
       this.editUser = { ...user }; // 填充當前用戶數據
       this.showEditForm = true; // 打開編輯表單
     },
+
+    // 關閉編輯用戶表單
     closeForm() {
       this.showEditForm = false; // 關閉編輯表單
       this.formSubmitted = false; // 重置表單提交狀態
@@ -436,6 +509,8 @@ export default {
         first_name: '',
         last_name: '',
         email: '',
+        password: '',
+        confirmPassword: '',
         role: 'user',
         phone: '',
         address1: '',
@@ -445,6 +520,8 @@ export default {
         country: '',
       };
     },
+
+    // 更新用戶
     async updateUser() {
       this.formSubmitted = true; // 標記表單已提交
 
@@ -464,9 +541,21 @@ export default {
         return; // 如果有欄位為空，停止提交
       }
 
+      // 如果提供了新密碼，檢查是否符合規則
+      if (this.editUser.password && !this.isPasswordValid(this.editUser.password)) {
+        alert('Password must be at least 7 characters and contain both letters and numbers.');
+        return;
+      }
+
+      // 檢查密碼和確認密碼是否匹配
+      if (this.editUser.password && !this.isPasswordMatch(this.editUser.password, this.editUser.confirmPassword)) {
+        alert('Passwords do not match.');
+        return;
+      }
+
       try {
         await api.updateUserByAdmin(this.editUser.id, this.editUser); // 更新用戶資料
-        this.fetchUsers(); // 重新獲取用戶列表
+        await this.fetchUsers(); // 更新後重新獲取用戶資料
         this.closeForm(); // 關閉表單
         alert('User updated successfully!');
       } catch (error) {
@@ -474,16 +563,23 @@ export default {
         console.error('Error updating user:', error);
       }
     },
+
+    // 打開新增用戶表單
     openAddForm() {
       this.showAddForm = true; // 打開新增表單
     },
+
+    // 關閉新增用戶表單
     closeAddForm() {
       this.showAddForm = false; // 關閉新增表單
       this.addFormSubmitted = false; // 重置表單提交狀態
+      this.emailExists = false; // 重置 Email 存在狀態
       this.newUser = { // 重置表單數據
         first_name: '',
         last_name: '',
         email: '',
+        password: '',
+        confirmPassword: '',
         role: 'user',
         phone: '',
         address1: '',
@@ -493,6 +589,8 @@ export default {
         country: '',
       };
     },
+
+    // 新增用戶
     async addUser() {
       this.addFormSubmitted = true; // 標記表單已提交
 
@@ -501,6 +599,8 @@ export default {
         !this.newUser.first_name ||
         !this.newUser.last_name ||
         !this.newUser.email ||
+        !this.newUser.password || // 檢查密碼
+        !this.newUser.confirmPassword || // 檢查確認密碼
         !this.newUser.role ||
         !this.newUser.phone ||
         !this.newUser.address1 ||
@@ -512,15 +612,46 @@ export default {
         return; // 如果有欄位為空，停止提交
       }
 
+      // 檢查密碼是否符合規則
+      if (!this.isPasswordValid(this.newUser.password)) {
+        alert('Password must be at least 7 characters and contain both letters and numbers.');
+        return;
+      }
+
+      // 檢查密碼和確認密碼是否匹配
+      if (!this.isPasswordMatch(this.newUser.password, this.newUser.confirmPassword)) {
+        alert('Passwords do not match.');
+        return;
+      }
+
+      // 檢查 Email 是否已存在
+      if (this.users.some(user => user.email === this.newUser.email)) {
+        this.emailExists = true;
+        return;
+      }
+
       try {
-        const response = await api.addUser(this.newUser); // 新增用戶
-        this.users.push(response.data); // 將新用戶添加到列表中
+        await api.addUser(this.newUser); // 新增用戶
+        await this.fetchUsers(); // 新增後重新獲取用戶資料
         this.closeAddForm(); // 關閉表單
         alert('User added successfully!');
       } catch (error) {
         alert('Failed to add user.');
         console.error('Error adding user:', error);
       }
+    },
+
+    // 驗證密碼是否符合規則
+    isPasswordValid(password) {
+      const minLength = 7;
+      const hasLetter = /[a-zA-Z]/.test(password);
+      const hasNumber = /\d/.test(password);
+      return password.length >= minLength && hasLetter && hasNumber;
+    },
+
+    // 檢查密碼和確認密碼是否匹配
+    isPasswordMatch(password, confirmPassword) {
+      return password === confirmPassword;
     },
   },
 };

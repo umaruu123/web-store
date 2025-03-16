@@ -60,6 +60,9 @@ export default {
   getUsers() {
     return api.get('/admin/users');
   },
+  addUser(data) {
+    return api.post('/admin/users', data); // 確保路徑和後端一致
+  },
   // 刪除用戶
   deleteUser(userId) {
     return api.delete(`/admin/users/${userId}`);

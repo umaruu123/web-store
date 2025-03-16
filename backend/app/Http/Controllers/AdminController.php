@@ -86,4 +86,38 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'User deleted successfully!']);
     }
+    public function addUser(Request $request)
+        {
+            // 驗證請求資料
+            $request->validate([
+                'first_name' => 'required|string',
+                'last_name' => 'required|string',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:7|regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/', // 密碼驗證
+                'role' => 'required|in:user,admin',
+                'phone' => 'required|string',
+                'address1' => 'required|string',
+                'city' => 'required|string',
+                'state' => 'required|string',
+                'zip' => 'required|string',
+                'country' => 'required|string',
+            ]);
+
+            // 創建用戶
+            $user = User::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password), // 加密密碼
+                'role' => $request->role,
+                'phone' => $request->phone,
+                'address1' => $request->address1,
+                'city' => $request->city,
+                'state' => $request->state,
+                'zip' => $request->zip,
+                'country' => $request->country,
+            ]);
+
+            return response()->json(['message' => 'User added successfully!', 'data' => $user], 201);
+        }
 }
