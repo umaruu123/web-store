@@ -25,7 +25,7 @@
         <tr v-for="product in products" :key="product.id">
           <td>{{ product.id }}</td>
           <td>{{ product.name }}</td>
-          <td>${{ typeof product.price === 'number' ? product.price.toFixed(2) : product.price }}</td>
+          <td>RM{{ typeof product.price === 'number' ? product.price.toFixed(2) : product.price }}</td>
           <td>{{ product.stock }}</td>
           <td>{{ product.category ? product.category.name : 'No Category' }}</td>
           <td>{{ product.sku }}</td>

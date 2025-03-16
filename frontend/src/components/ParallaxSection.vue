@@ -3,6 +3,7 @@
     <div class="parallax-wrapper">
       <!-- 第一張圖片 -->
       <div class="parallax-image first" ref="firstImage">
+        <img src="/image/animal.webp" alt="Adorable Plush Collection" class="image" />
         <div class="content">
           <h2>Adorable Plush Collection</h2>
           <p>Soft, huggable plushies for every moment.</p>
@@ -14,6 +15,7 @@
 
       <!-- 第二張圖片 -->
       <div class="parallax-image second" ref="secondImage">
+        <img src="/image/Grace_Gentle0723-149.webp" alt="Marshmallow Soft Plush" class="image" />
         <div class="content">
           <h2>Marshmallow Soft Plush</h2>
           <p>Fluffy, cloud-like plush toys.</p>
@@ -31,6 +33,7 @@ export default {
   name: "ParallaxSection",
   mounted() {
     window.addEventListener("scroll", this.handleScroll);
+    this.handleScroll(); // 初始化時調用一次
   },
   beforeUnmount() {
     window.removeEventListener("scroll", this.handleScroll);
@@ -43,13 +46,14 @@ export default {
         const scrollY = window.scrollY;
 
         if (firstImage) {
-          let offset = scrollY * -0.3;
+          // 第一張圖片往上移動，直到消失
+          let offset = scrollY * -1.5; // 調整速度，讓第一張圖片更快消失
           firstImage.style.transform = `translateY(${offset}px)`;
         }
 
         if (secondImage) {
-          let offset = scrollY * -0.6;
-          secondImage.style.transform = `translateY(${offset}px)`;
+          // 第二張圖片保持不動
+          secondImage.style.transform = `translateY(0)`;
         }
       });
     },
@@ -62,21 +66,21 @@ export default {
 .parallax-container {
   position: relative;
   width: 100%;
+  height: 100vh; /* 確保容器有高度 */
   overflow: hidden;
 }
 
 .parallax-wrapper {
   position: relative;
   width: 100%;
+  height: 100%;
 }
 
 /* Parallax 圖片 */
 .parallax-image {
-  position: relative;
+  position: absolute; /* 讓圖片疊在一起 */
   width: 100%;
-  height: 70vh; /* 視口 70% */
-  background-size: cover;
-  background-position: center;
+  height: 100vh; /* 視口 100% */
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
@@ -85,20 +89,32 @@ export default {
 }
 
 .first {
-  background-image: url('/image/animal.webp');
+  z-index: 2; /* 第一張圖片在上層 */
 }
 
 .second {
-  background-image: url('/image/Grace_Gentle0723-149.webp');
+  z-index: 1; /* 第二張圖片在下層 */
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 讓圖片佔滿容器，保持比例 */
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* 內容區 */
 .content {
+  position: relative; /* 確保內容在圖片上方 */
+  z-index: 3; /* 內容區在最上層 */
   color: black;
-  padding: 20px;
+  padding: 40px; /* 增加內邊距 */
   border-radius: 10px;
   max-width: 600px;
   text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.8); /* 增加背景色，確保內容清晰 */
 }
 
 h2 {
@@ -143,6 +159,7 @@ p {
 
   .content {
     max-width: 80%;
+    padding: 30px; /* 調整內邊距 */
   }
 }
 
@@ -154,7 +171,7 @@ p {
 
   .content {
     text-align: center;
-    padding: 15px;
+    padding: 20px; /* 調整內邊距 */
     max-width: 90%;
   }
 
