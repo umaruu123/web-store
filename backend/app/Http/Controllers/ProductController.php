@@ -101,4 +101,14 @@ class ProductController extends Controller
 
         return response()->json($products);
     }
+    public function showDetails($productId): JsonResponse
+    {
+        $product = Product::with('category')->find($productId);
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
+        return response()->json($product);
+    }
 }

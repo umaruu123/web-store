@@ -8,11 +8,12 @@ use App\Http\Controllers\CategoryController;
 
 // 這裡放所有 API 路由
 Route::get('/products', [ProductController::class, 'index']);
-Route::get('products/{product}/details', [ProductController::class, 'showDetails']);
+Route::get('/products/{product}/details', [ProductController::class, 'showDetails']);
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/products/category/{categoryName}', [ProductController::class, 'getProductsByCategory']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/details', [UserController::class, 'getUserDetails']); // 獲取用戶信息

@@ -15,6 +15,7 @@
             v-for="product in group"
             :key="product.id"
             class="product-card"
+            @click="viewProductDetails(product.id)"
           >
             <div class="product-image-container">
               <img :src="product.image_url" :alt="product.name" class="product-image" />
@@ -103,6 +104,11 @@ export default {
     nextSlide() {
       this.currentSlide = (this.currentSlide + 1) % this.groupedProducts.length;
     },
+
+    // 查看商品詳細資料
+    viewProductDetails(productId) {
+      this.$router.push({ name: 'ProductDetails', params: { id: productId } });
+    }
   },
 };
 </script>

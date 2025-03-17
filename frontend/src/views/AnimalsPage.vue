@@ -5,7 +5,7 @@
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else class="product-list">
-      <div v-for="product in products" :key="product.id" class="product-card">
+      <div v-for="product in products" :key="product.id" class="product-card" @click="viewProductDetails(product.id)">
         <img :src="product.image_url" :alt="product.name" class="product-image" />
         <h3 class="product-name">{{ product.name }}</h3>
         <p class="product-price">RM{{ product.price.toFixed(2) }}</p>
@@ -41,6 +41,11 @@ export default {
       this.loading = false;
     }
   },
+  methods: {
+    viewProductDetails(productId) {
+      this.$router.push({ name: 'ProductDetails', params: { id: productId } });
+    }
+  }
 };
 </script>
 
