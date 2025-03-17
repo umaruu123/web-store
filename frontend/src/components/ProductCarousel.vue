@@ -167,7 +167,7 @@ export default {
 
 .product-image {
   width: 100%;
-  height: 300px; /* 增加圖片高度 */
+  height: 400px; /* 增加圖片高度 */
   object-fit: cover; /* 讓圖片佔滿容器 */
   transition: transform 0.3s ease;
 }

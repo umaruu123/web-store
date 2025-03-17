@@ -93,4 +93,12 @@ class ProductController extends Controller
 
         return response()->json(null, 204); // 204 表示資源刪除成功
     }
+    public function getProductsByCategory($categoryName): JsonResponse
+    {
+        $products = Product::whereHas('category', function ($query) use ($categoryName) {
+            $query->where('name', $categoryName);
+        })->get();
+
+        return response()->json($products);
+    }
 }

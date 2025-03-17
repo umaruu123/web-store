@@ -12,6 +12,9 @@ import AdminDashboard from '@/views/AdminDashboard.vue';
 import AdminUsers from '@/views/AdminUsers.vue';
 import AdminOrders from '@/views/AdminOrders.vue';
 import AdminProducts from '@/views/AdminProducts.vue';
+import AnimalsPage from "@/views/AnimalsPage.vue";
+import BagsChairsPage from "@/views/BagsChairsPage.vue";
+import BabyBooksPage from "@/views/BabyBooksPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,6 +28,18 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: () => import('../views/AboutView.vue'),
+    },
+    {
+      path: "/animals",
+      component: AnimalsPage,
+    },
+    {
+      path: "/bags-chairs",
+      component: BagsChairsPage,
+    },
+    {
+      path: "/baby-books",
+      component: BabyBooksPage,
     },
     {
       path: '/login',
@@ -76,6 +91,7 @@ const router = createRouter({
         { path: 'products', component: AdminProducts },
       ],
     },
+    
   ],
 })
 

@@ -74,4 +74,5 @@ class CategoryController extends Controller
             'data' => $category,
         ]);
     }
+    
 }
