@@ -56,16 +56,7 @@ export default {
         // 更新 Pinia Store 中的用戶信息
         const userStore = useUserStore();
         userStore.setUser(user);
-        userStore.setAddress({
-          first_name: user.first_name,
-          last_name: user.last_name,
-          address1: user.address1,
-          city: user.city,
-          state: user.state,
-          zip: user.zip,
-          country: user.country,
-          phone: user.phone,
-        });
+
 
         // 登錄後獲取購物車數據
         const cartStore = useCartStore();

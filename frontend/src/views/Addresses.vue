@@ -93,7 +93,7 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue';
-import { useUserStore } from '@/stores/userStore'; // 引入 Pinia Store
+import { useUserStore } from '@/stores/userStore';
 import AccountNavigation from '@/components/AccountNavigation.vue';
 import api from '@/api';
 
@@ -140,10 +140,8 @@ export default {
     const fetchAddress = async () => {
       try {
         if (userStore.address) {
-          // 如果 Pinia Store 中有地址信息，直接使用
           address.value = userStore.address;
         } else {
-          // 如果 Pinia Store 中沒有地址信息，從 API 獲取
           const response = await api.getAddresses();
           address.value = response.data;
           userStore.setAddress(response.data); // 將地址信息存儲到 Pinia Store
@@ -180,9 +178,11 @@ export default {
     const updateAddress = async () => {
       try {
         await api.updateAddress(editAddress.value); // 更新地址
-        userStore.setAddress(editAddress.value); // 更新 Pinia Store
+        userStore.updateAddress(editAddress.value); // 更新 Pinia Store
         fetchAddress(); // 重新獲取地址信息
         closeForm(); // 關閉表單並重置數據
+        alert('Address updated successfully!');
+        window.location.reload(); // 刷新頁面
       } catch (error) {
         console.error('Failed to update address:', error);
         alert('Failed to update address. Please try again.');

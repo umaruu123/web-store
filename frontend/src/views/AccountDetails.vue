@@ -57,8 +57,8 @@
 
 <script>
 import { ref, onMounted } from 'vue';
-import { useUserStore } from '@/stores/userStore'; // 引入 Pinia Store
-import { useRouter } from 'vue-router'; // 引入 useRouter
+import { useUserStore } from '@/stores/userStore';
+import { useRouter } from 'vue-router';
 import AccountNavigation from '@/components/AccountNavigation.vue';
 import api from '@/api';
 
@@ -82,19 +82,10 @@ export default {
     const passwordError = ref('');
     const passwordMismatchError = ref('');
 
-    // 檢查用戶是否已登錄
-    const checkAuth = () => {
-      const userStore = useUserStore();
-      if (!userStore.user) {
-        router.push('/login'); // 未登錄則重定向到登錄頁面
-      }
-    };
-
     // 從 Pinia Store 中獲取用戶信息
     const fetchUserDetails = async () => {
       try {
         if (userStore.user) {
-          // 如果 Pinia Store 中有用戶信息，直接使用
           editUser.value = {
             first_name: userStore.user.first_name,
             last_name: userStore.user.last_name,
@@ -105,7 +96,6 @@ export default {
             confirmNewPassword: '',
           };
         } else {
-          // 如果 Pinia Store 中沒有用戶信息，從 API 獲取
           const response = await api.getUserDetails();
           editUser.value = {
             first_name: response.data.first_name,
@@ -141,7 +131,16 @@ export default {
       }
 
       try {
+        // 更新用戶信息
         await api.updateUserDetails({
+          first_name: editUser.value.first_name,
+          last_name: editUser.value.last_name,
+          email: editUser.value.email,
+          phone: editUser.value.phone,
+        });
+
+        // 更新 Pinia Store 中的用戶信息
+        userStore.updateUser({
           first_name: editUser.value.first_name,
           last_name: editUser.value.last_name,
           email: editUser.value.email,
@@ -156,6 +155,7 @@ export default {
         }
 
         alert('Details updated successfully!');
+        window.location.reload(); // 刷新頁面
       } catch (error) {
         console.error('Failed to update details:', error);
         alert('Failed to update details. Please try again.');
@@ -169,10 +169,7 @@ export default {
       return password.length >= 7 && hasLetter && hasNumber;
     };
 
-    
-
     onMounted(() => {
-      checkAuth(); // 檢查用戶是否已登錄
       fetchUserDetails();
     });
 
