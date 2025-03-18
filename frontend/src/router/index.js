@@ -1,8 +1,9 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import Login from '@/views/Login.vue'
-import Register from '@/views/Register.vue'
-import AccountCreated from '@/views/AccountCreated.vue' // 新增 AccountCreated.vue
+import { createRouter, createWebHistory } from 'vue-router';
+import { useUserStore } from '@/stores/userStore'; // 引入 Pinia Store
+import HomeView from '../views/HomeView.vue';
+import Login from '@/views/Login.vue';
+import Register from '@/views/Register.vue';
+import AccountCreated from '@/views/AccountCreated.vue';
 import AccountDetails from '@/views/AccountDetails.vue';
 import Orders from '@/views/Orders.vue';
 import Addresses from '@/views/Addresses.vue';
@@ -45,46 +46,54 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: Login,
+      meta: { requiresAuth: false }, // 不需要登錄
     },
     {
       path: '/register',
       name: 'register',
       component: Register,
+      meta: { requiresAuth: false }, // 不需要登錄
     },
     {
-      path: '/account-created', // ➜ 新增註冊成功頁面路由
+      path: '/account-created',
       name: 'account-created',
       component: AccountCreated,
+      meta: { requiresAuth: false }, // 不需要登錄
     },
     {
-      path: '/account/details', // 路徑可以根據需求調整
-      name: 'AccountDetails', // 路由名稱
+      path: '/account/details',
+      name: 'AccountDetails',
       component: AccountDetails,
+      meta: { requiresAuth: true }, // 需要登錄
     },
     {
       path: '/account/orders',
       name: 'Orders',
       component: Orders,
+      meta: { requiresAuth: true }, // 需要登錄
     },
     {
       path: '/account/addresses',
       name: 'Addresses',
       component: Addresses,
+      meta: { requiresAuth: true }, // 需要登錄
     },
     {
       path: '/account/wishlists',
       name: 'Wishlists',
       component: Wishlists,
+      meta: { requiresAuth: true }, // 需要登錄
     },
     {
       path: '/account/recently-viewed',
       name: 'RecentlyViewed',
       component: RecentlyViewed,
+      meta: { requiresAuth: true }, // 需要登錄
     },
     {
       path: '/admin',
       component: AdminDashboard,
-      meta: { hideHeader: true }, // 添加元信息
+      meta: { requiresAuth: true, hideHeader: true }, // 需要登錄
       children: [
         { path: 'users', component: AdminUsers },
         { path: 'orders', component: AdminOrders },
@@ -95,9 +104,22 @@ const router = createRouter({
       path: '/product/:id',
       name: 'ProductDetails',
       component: () => import('../views/ProductDetails.vue'),
+      meta: { requiresAuth: false }, // 不需要登錄
     },
-    
   ],
-})
+});
 
-export default router
+// 全局路由守衛
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore();
+  const isAuthenticated = !!userStore.user; // 檢查用戶是否已登錄
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    // 如果路由需要登錄且用戶未登錄，則重定向到登錄頁面
+    next({ name: 'login' });
+  } else {
+    next(); // 否則繼續導航
+  }
+});
+
+export default router;
