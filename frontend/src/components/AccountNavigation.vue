@@ -15,7 +15,8 @@
 </template>
 
 <script>
-import { useUserStore } from '@/stores/userStore'; // 引入 Pinia Store
+import { useUserStore } from '@/stores/userStore'; // 引入用戶 Store
+import { useCartStore } from '@/stores/cartStore'; // 引入購物車 Store
 
 export default {
   props: {
@@ -30,9 +31,14 @@ export default {
     },
     logout() {
       const userStore = useUserStore();
+      const cartStore = useCartStore(); // 使用購物車 Store
+
       userStore.clearUser(); // 清除 Pinia Store 中的用戶狀態
+      cartStore.clearCart(); // 清除購物車狀態
+
       localStorage.removeItem('authToken'); // 清除 localStorage 中的 authToken
       localStorage.removeItem('user'); // 清除 localStorage 中的 user
+
       this.$router.push('/login'); // 跳轉到登錄頁面
     },
   },

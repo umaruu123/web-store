@@ -1,85 +1,89 @@
 <template>
-    <div class="product-details">
-      <div v-if="loading" class="loading">Loading...</div>
-      <div v-else-if="error" class="error">{{ error }}</div>
-      <div v-else class="product-info">
-        <img :src="product.image_url" :alt="product.name" class="product-image" />
-        <h1 class="product-name">{{ product.name }}</h1>
-        <p class="product-price">RM{{ parseFloat(product.price).toFixed(2) }}</p>
-        <p class="product-description">{{ product.description }}</p>
-  
-        <!-- 按鈕區域 -->
-        <div class="button-group">
-          <button class="wishlist-button" @click="addToWishlist(product.id)">
-            Add to Wishlist
-          </button>
-          <button class="cart-button" @click="addToCart(product.id)">
-            Add to Cart
-          </button>
-        </div>
+  <div class="product-details">
+    <div v-if="loading" class="loading">Loading...</div>
+    <div v-else-if="error" class="error">{{ error }}</div>
+    <div v-else class="product-info">
+      <img :src="product.image_url" :alt="product.name" class="product-image" />
+      <h1 class="product-name">{{ product.name }}</h1>
+      <p class="product-price">RM{{ parseFloat(product.price).toFixed(2) }}</p>
+      <p class="product-description">{{ product.description }}</p>
+
+      <!-- 按鈕區域 -->
+      <div class="button-group">
+        <button class="wishlist-button" @click="addToWishlist(product.id)">
+          Add to Wishlist
+        </button>
+        <button class="cart-button" @click="addToCart(product)">
+          Add to Cart
+        </button>
       </div>
     </div>
-  </template>
-  
-  <script>
-  import axios from "axios";
-  
-  export default {
-    data() {
-      return {
-        product: null,
-        loading: true,
-        error: null,
-      };
-    },
-    async mounted() {
-      const productId = this.$route.params.id;
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+import { useUserStore } from '@/stores/userStore'; // 引入用戶 Store
+import { useCartStore } from '@/stores/cartStore'; // 引入購物車 Store
+import { mapState } from 'pinia';
+
+export default {
+  data() {
+    return {
+      product: null,
+      loading: true,
+      error: null,
+    };
+  },
+  computed: {
+    // 使用 mapState 獲取用戶狀態
+    ...mapState(useUserStore, ['user']),
+  },
+  async mounted() {
+    const productId = this.$route.params.id;
+    try {
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/products/${productId}/details`
+      );
+      this.product = response.data;
+      this.product.price = parseFloat(this.product.price);
+    } catch (err) {
+      this.error = 'Failed to load product details.';
+      console.error(err);
+    } finally {
+      this.loading = false;
+    }
+  },
+  methods: {
+  async addToCart(product) {
+    if (!this.user) {
+      // 如果用戶未登錄，跳轉到登錄頁面
+      this.$router.push({ name: 'login' });
+    } else {
+      // 如果用戶已登錄，調用後端 API 添加商品到購物車
+      const cartStore = useCartStore();
+      await cartStore.addItem(product);
+      alert('Product added to cart!');
+    }
+  },
+
+    // 添加到願望清單
+    async addToWishlist(productId) {
       try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/api/products/${productId}/details`
+        const response = await axios.post(
+          'http://127.0.0.1:8000/api/wishlist',
+          { itemId: productId }
         );
-        this.product = response.data;
-        // 確保 price 是數字
-        this.product.price = parseFloat(this.product.price);
+        alert('Product added to wishlist!');
+        console.log('Wishlist response:', response.data);
       } catch (err) {
-        this.error = "Failed to load product details.";
+        alert('Failed to add to wishlist.');
         console.error(err);
-      } finally {
-        this.loading = false;
       }
     },
-    methods: {
-      // 添加到願望清單
-      async addToWishlist(productId) {
-        try {
-          const response = await axios.post(
-            "http://127.0.0.1:8000/api/wishlist",
-            { itemId: productId }
-          );
-          alert("Product added to wishlist!");
-          console.log("Wishlist response:", response.data);
-        } catch (err) {
-          alert("Failed to add to wishlist.");
-          console.error(err);
-        }
-      },
-      // 添加到購物車
-      async addToCart(productId) {
-        try {
-          const response = await axios.post(
-            "http://127.0.0.1:8000/api/cart",
-            { itemId: productId }
-          );
-          alert("Product added to cart!");
-          console.log("Cart response:", response.data);
-        } catch (err) {
-          alert("Failed to add to cart.");
-          console.error(err);
-        }
-      },
-    },
-  };
-  </script>
+  },
+};
+</script>
   
   <style scoped>
   .product-details {

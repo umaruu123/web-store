@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CartController;
 
 // 這裡放所有 API 路由
 Route::get('/products', [ProductController::class, 'index']);
@@ -38,4 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/categories', [CategoryController::class, 'store']); // 新增類別
     Route::put('/admin/categories/{category}', [CategoryController::class, 'update']); // 編輯類別
     Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy']); // 刪除類別
+
+    // 購物車相關路由
+    Route::get('/cart', [CartController::class, 'getCart']);
+    Route::post('/cart/add', [CartController::class, 'addToCart']);
+    Route::delete('/cart/remove/{productId}', [CartController::class, 'removeFromCart']);
+    Route::delete('/cart/clear', [CartController::class, 'clearCart']);
 });

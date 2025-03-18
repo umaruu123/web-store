@@ -16,10 +16,7 @@
 
         <!-- 搜索欄 -->
         <div class="search-container">
-          <!-- 🔍 按鈕（僅在小螢幕時顯示） -->
           <button class="search-icon" v-if="isMobile" @click="showSearchBar = !showSearchBar">🔍</button>
-
-          <!-- 搜索輸入框（大螢幕時直接顯示，小螢幕點擊 🔍 後顯示） -->
           <input
             type="text"
             placeholder="Search"
@@ -45,7 +42,7 @@
 
       <!-- 右邊的圖標 -->
       <div class="icons">
-        <!-- 用戶圖標：根據登入狀態顯示不同內容 -->
+        <!-- 用戶圖標 -->
         <router-link v-if="user" to="/account/details" class="icon-link">
           <i class="fas fa-user"></i>
         </router-link>
@@ -57,51 +54,91 @@
         <a href="#" class="icon-link">
           <i class="fas fa-heart"></i>
         </a>
-        <a href="#" class="icon-link">
+        <div class="cart-icon" @mouseenter="showCartPreview = true" @mouseleave="showCartPreview = false">
           <i class="fas fa-shopping-cart"></i>
-        </a>
+          <span class="cart-count">{{ cartTotalItems }}</span>
+          <!-- 購物車預覽 -->
+          <div v-if="showCartPreview" class="cart-preview">
+            <div v-if="cartItems.length > 0">
+              <div v-for="item in cartItems" :key="item.id" class="cart-item">
+                <img :src="item.image_url" :alt="item.name" class="cart-item-image" />
+                <div class="cart-item-details">
+                  <p class="cart-item-name">{{ item.name }}</p>
+                  <p class="cart-item-price">RM{{ typeof item.price === 'number' ? item.price.toFixed(2) : 'N/A' }}</p>
+                  <p class="cart-item-quantity">Quantity: {{ item.quantity }}</p>
+                </div>
+              </div>
+            </div>
+            <div v-else class="empty-cart">
+              Your cart is empty.
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 </template>
 
 <script>
-import { useUserStore } from '@/stores/userStore'; // 引入 Pinia Store
-import { mapState } from 'pinia'; // 引入 mapState
+import { useUserStore } from '@/stores/userStore'; // 引入用戶 Store
+import { useCartStore } from '@/stores/cartStore'; // 引入購物車 Store
+import { mapState } from 'pinia';
 
 export default {
   name: 'Header',
   data() {
     return {
       searchQuery: '',
-      menuOpen: false, // 控制漢堡選單開關
-      showSearchBar: false, // 控制是否顯示搜尋框（小螢幕）
-      isMobile: window.innerWidth < 1280, // 判斷是否為小螢幕
+      menuOpen: false,
+      showSearchBar: false,
+      isMobile: window.innerWidth < 1280,
+      showCartPreview: false, // 控制購物車預覽的顯示
     };
   },
   computed: {
-    // 使用 mapState 將 Pinia Store 中的 user 狀態映射到組件
+    // 使用 mapState 獲取用戶和購物車狀態
     ...mapState(useUserStore, ['user']),
+    ...mapState(useCartStore, ['items', 'totalItems']),
+    // 購物車中的商品列表
+    cartItems() {
+      return this.items;
+    },
+    // 購物車中的商品總數
+    cartTotalItems() {
+      return this.totalItems;
+    },
   },
   methods: {
+    // 處理搜索
     handleSearch() {
       if (this.searchQuery.trim()) {
         console.log('Searching for:', this.searchQuery);
       }
     },
+    // 隱藏搜索欄
     hideSearch() {
       if (!this.searchQuery.trim()) {
-        this.showSearchBar = false; // 如果沒有輸入內容，則隱藏搜尋框
+        this.showSearchBar = false;
       }
     },
+    // 更新屏幕大小
     updateScreenSize() {
       this.isMobile = window.innerWidth < 1280;
     },
   },
-  mounted() {
+  async mounted() {
+    // 監聽窗口大小變化
     window.addEventListener('resize', this.updateScreenSize);
+
+    // 如果用戶已登錄，獲取購物車數據
+    const userStore = useUserStore();
+    if (userStore.user) {
+      const cartStore = useCartStore();
+      await cartStore.fetchCart(); // 從後端獲取購物車數據
+    }
   },
   beforeUnmount() {
+    // 移除窗口大小變化監聽器
     window.removeEventListener('resize', this.updateScreenSize);
   },
 };
@@ -243,6 +280,73 @@ export default {
 
 .icon-link:hover {
   color: #007bff;
+}
+
+/* 購物車圖標樣式 */
+.cart-icon {
+  position: relative;
+  cursor: pointer;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+/* 購物車預覽樣式 */
+.cart-preview {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 300px;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 10px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.cart-item-image {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.cart-item-details {
+  flex: 1;
+}
+
+.cart-item-name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.cart-item-price {
+  font-size: 12px;
+  color: #888;
+}
+
+.cart-item-quantity {
+  font-size: 12px;
+  color: #888;
+}
+
+.empty-cart {
+  text-align: center;
+  font-size: 14px;
+  color: #888;
 }
 
 /* 📌 當螢幕介於 1280px ~ 1400px */

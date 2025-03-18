@@ -28,6 +28,7 @@
 <script>
 import axios from 'axios'; // 引入 axios
 import { useUserStore } from '@/stores/userStore'; // 引入 Pinia Store
+import { useCartStore } from '@/stores/cartStore'; // 引入購物車 Store
 
 export default {
   data() {
@@ -65,6 +66,10 @@ export default {
           country: user.country,
           phone: user.phone,
         });
+
+        // 登錄後獲取購物車數據
+        const cartStore = useCartStore();
+        await cartStore.fetchCart(); // 從後端獲取購物車數據
 
         // 根據角色跳轉到不同頁面
         if (role === 'admin') {
