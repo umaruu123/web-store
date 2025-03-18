@@ -68,6 +68,8 @@
                   <p class="cart-item-quantity">Quantity: {{ item.quantity }}</p>
                 </div>
               </div>
+              <!-- 添加 Check Out 按鈕 -->
+              <button class="checkout-button" @click="goToCart">Check Out</button>
             </div>
             <div v-else class="empty-cart">
               Your cart is empty.
@@ -125,14 +127,17 @@ export default {
     updateScreenSize() {
       this.isMobile = window.innerWidth < 1280;
     },
+    // 跳轉到購物車頁面
+    goToCart() {
+      this.$router.push({ name: 'Cart' });
+    },
   },
   async mounted() {
     // 監聽窗口大小變化
     window.addEventListener('resize', this.updateScreenSize);
 
     // 如果用戶已登錄，獲取購物車數據
-    const userStore = useUserStore();
-    if (userStore.user) {
+    if (this.user) {
       const cartStore = useCartStore();
       await cartStore.fetchCart(); // 從後端獲取購物車數據
     }
@@ -347,6 +352,24 @@ export default {
   text-align: center;
   font-size: 14px;
   color: #888;
+}
+
+/* Check Out 按鈕樣式 */
+.checkout-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.checkout-button:hover {
+  background-color: #0056b3;
 }
 
 /* 📌 當螢幕介於 1280px ~ 1400px */

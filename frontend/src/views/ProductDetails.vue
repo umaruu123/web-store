@@ -87,7 +87,7 @@ export default {
   
   <style scoped>
   .product-details {
-    padding: 2rem;
+    padding: 10rem;
     text-align: center;
   }
   

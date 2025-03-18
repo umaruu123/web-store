@@ -33,6 +33,7 @@ export const useCartStore = defineStore('cart', {
         const response = await api.get('/cart');
         console.log('Cart API Response:', response.data); // 打印返回的數據
         if (Array.isArray(response.data)) {
+          // 更新 items 狀態
           this.items = response.data.map((item) => ({
             ...item.product, // 將後端返回的商品數據映射到前端格式
             quantity: item.quantity,
@@ -45,8 +46,9 @@ export const useCartStore = defineStore('cart', {
         console.error('Failed to fetch cart:', error);
       }
     },
+
     // 添加商品到購物車
-    async addItem(product) {
+    async addItem(product, quantity = 1) {
       const userStore = useUserStore();
       if (!userStore.user) {
         this.$router.push({ name: 'login' }); // 如果用戶未登錄，跳轉到登錄頁面
@@ -54,27 +56,54 @@ export const useCartStore = defineStore('cart', {
       }
 
       try {
+        // 更新後端數據
         await api.post('/cart/add', {
           product_id: product.id,
-          quantity: 1,
+          quantity: quantity,
         });
-        await this.fetchCart(); // 重新獲取購物車數據
+
+        // 更新本地狀態
+        const existingItem = this.items.find((item) => item.id === product.id);
+        if (existingItem) {
+          existingItem.quantity += quantity; // 如果商品已存在，增加數量
+        } else {
+          this.items.push({ ...product, quantity }); // 如果商品不存在，添加到購物車
+        }
+
+        console.log('Item added to cart:', product); // 調試信息
       } catch (error) {
         console.error('Failed to add item to cart:', error);
       }
     },
+
     // 從購物車中移除商品
     async removeItem(productId) {
       try {
+        // 更新後端數據
         await api.delete(`/cart/remove/${productId}`);
-        await this.fetchCart(); // 重新獲取購物車數據
+
+        // 更新本地狀態
+        this.items = this.items.filter((item) => item.id !== productId);
+
+        console.log('Item removed from cart:', productId); // 調試信息
       } catch (error) {
         console.error('Failed to remove item from cart:', error);
       }
     },
-    // 清空購物車（僅清除前端狀態）
-    clearCart() {
-      this.items = []; // 清空前端購物車數據
+
+    // 清空購物車
+    async clearCart() {
+      try {
+        // 更新後端數據
+        await api.delete('/cart/clear');
+
+        // 更新本地狀態
+        this.items = [];
+
+        console.log('Cart cleared'); // 調試信息
+      } catch (error) {
+        console.error('Failed to clear cart:', error);
+      }
     },
   },
   getters: {

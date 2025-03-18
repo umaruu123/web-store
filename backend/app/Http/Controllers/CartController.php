@@ -54,7 +54,9 @@ class CartController extends Controller
             ]);
         }
 
-        return response()->json(['message' => 'Product added to cart']);
+        // 返回最新的購物車數據
+        $cart = Cart::where('user_id', $user->id)->with('product')->get();
+        return response()->json($cart);
     }
 
     // 從購物車中移除商品

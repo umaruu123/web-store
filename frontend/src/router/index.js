@@ -67,6 +67,11 @@ const router = createRouter({
       meta: { requiresAuth: true }, // 需要登錄
     },
     {
+      path: '/checkout',
+      name: 'Checkout',
+      component: () => import('@/views/Checkout.vue'),
+    },
+    {
       path: '/account/orders',
       name: 'Orders',
       component: Orders,
@@ -89,6 +94,11 @@ const router = createRouter({
       name: 'RecentlyViewed',
       component: RecentlyViewed,
       meta: { requiresAuth: true }, // 需要登錄
+    },
+    {
+      path: '/cart',
+      name: 'Cart',
+      component: () => import('@/views/Cart.vue'),
     },
     {
       path: '/admin',
