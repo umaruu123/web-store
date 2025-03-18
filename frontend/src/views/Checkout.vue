@@ -61,111 +61,127 @@
   </template>
   
   <script>
-  import { useCartStore } from '@/stores/cartStore';
-  import { useUserStore } from '@/stores/userStore';
-  import { computed, onMounted } from 'vue';
-  import { useRouter } from 'vue-router';
-  import api from '@/api';
-  
-  export default {
-    name: 'Checkout',
-    setup() {
-      const cartStore = useCartStore();
-      const userStore = useUserStore();
-      const router = useRouter();
-  
-      // 計算購物車總金額
-      const totalAmount = computed(() => {
-        return cartStore.items.reduce((total, item) => {
-          return total + item.price * item.quantity;
-        }, 0);
-      });
-  
-      // 格式化地址
-      const formatAddress = (address) => {
-        if (!address) return 'No address provided';
-  
-        const { address1, city, state, zip, country } = address;
-        const addressParts = [address1, city, state, zip, country].filter(Boolean); // 過濾掉空值
-        return addressParts.join(', ') || 'No address provided'; // 將非空字段用逗號連接
-      };
-  
-      // 獲取用戶信息
-      const fetchUserDetails = async () => {
-        try {
-          const response = await api.getUserDetails(); // 從後端獲取用戶信息
-          userStore.setUser(response.data); // 將用戶信息存儲到 Pinia Store
-        } catch (error) {
-          console.error('Failed to fetch user details:', error);
-        }
-      };
-  
-      // 獲取地址信息
-      const fetchAddress = async () => {
-        try {
-          const response = await api.getAddresses(); // 從後端獲取地址信息
-          userStore.setAddress(response.data); // 將地址信息存儲到 Pinia Store
-        } catch (error) {
-          console.error('Failed to fetch addresses:', error);
-        }
-      };
-  
-      // 檢查用戶是否已登錄
-      onMounted(async () => {
-        if (!userStore.user) {
-          router.push({ name: 'Login' }); // 如果未登錄，跳轉到登錄頁面
-        } else {
-          await fetchUserDetails(); // 獲取用戶信息
-          await fetchAddress(); // 獲取地址信息
-        }
-      });
-  
-      // 獲取用戶信息
-      const user = computed(() => {
-        if (!userStore.user) {
-          return {
-            name: 'Guest',
-            address: 'No address provided',
-          };
-        }
+import { useCartStore } from '@/stores/cartStore';
+import { useUserStore } from '@/stores/userStore';
+import { computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import api from '@/api';
+
+export default {
+  name: 'Checkout',
+  setup() {
+    const cartStore = useCartStore();
+    const userStore = useUserStore();
+    const router = useRouter();
+
+    // 計算購物車總金額
+    const totalAmount = computed(() => {
+      return cartStore.items.reduce((total, item) => {
+        return total + item.price * item.quantity;
+      }, 0);
+    });
+
+    // 格式化地址
+    const formatAddress = (address) => {
+      if (!address) return 'No address provided';
+
+      const { address1, city, state, zip, country } = address;
+      const addressParts = [address1, city, state, zip, country].filter(Boolean); // 過濾掉空值
+      return addressParts.join(', ') || 'No address provided'; // 將非空字段用逗號連接
+    };
+
+    // 獲取用戶信息
+    const fetchUserDetails = async () => {
+      try {
+        const response = await api.getUserDetails(); // 從後端獲取用戶信息
+        userStore.setUser(response.data); // 將用戶信息存儲到 Pinia Store
+      } catch (error) {
+        console.error('Failed to fetch user details:', error);
+      }
+    };
+
+    // 獲取地址信息
+    const fetchAddress = async () => {
+      try {
+        const response = await api.getAddresses(); // 從後端獲取地址信息
+        userStore.setAddress(response.data); // 將地址信息存儲到 Pinia Store
+      } catch (error) {
+        console.error('Failed to fetch addresses:', error);
+      }
+    };
+
+    // 檢查用戶是否已登錄
+    onMounted(async () => {
+      if (!userStore.user) {
+        router.push({ name: 'Login' }); // 如果未登錄，跳轉到登錄頁面
+      } else {
+        await fetchUserDetails(); // 獲取用戶信息
+        await fetchAddress(); // 獲取地址信息
+      }
+    });
+
+    // 獲取用戶信息
+    const user = computed(() => {
+      if (!userStore.user) {
         return {
-          name: `${userStore.user.first_name || ''} ${userStore.user.last_name || ''}`.trim() || 'Guest',
-          address: formatAddress(userStore.address), // 從 userStore.address 中獲取地址信息
+          name: 'Guest',
+          address: 'No address provided',
         };
-      });
-  
-      // 前往 Addresses.vue
-      const goToAddresses = () => {
-        router.push({ name: 'Addresses' });
-      };
-  
+      }
       return {
-        cartItems: computed(() => cartStore.items),
-        totalAmount,
-        user,
-        goToAddresses,
+        name: `${userStore.user.first_name || ''} ${userStore.user.last_name || ''}`.trim() || 'Guest',
+        address: formatAddress(userStore.address), // 從 userStore.address 中獲取地址信息
       };
-    },
-    data() {
-      return {
-        paymentDetails: {
-          cardNumber: '',
-          expiryDate: '',
-          cvv: '',
-        },
-      };
-    },
-    methods: {
-      submitPayment() {
-        alert('Payment submitted successfully!');
-        // 這裡可以添加實際的付款邏輯
+    });
+
+    // 前往 Addresses.vue
+    const goToAddresses = () => {
+      router.push({ name: 'Addresses' });
+    };
+
+    return {
+      cartItems: computed(() => cartStore.items),
+      totalAmount,
+      user,
+      goToAddresses,
+    };
+  },
+  data() {
+    return {
+      paymentDetails: {
+        cardNumber: '',
+        expiryDate: '',
+        cvv: '',
       },
-      goToCart() {
-        this.$router.push({ name: 'Cart' });
-      },
+    };
+  },
+  methods: {
+    async submitPayment() {
+      try {
+        // 調用後端 API 創建訂單
+        const response = await api.createOrder({
+          paymentDetails: this.paymentDetails, // 傳遞付款信息
+        });
+
+        // 訂單創建成功後，清空購物車
+        const cartStore = useCartStore();
+        await cartStore.clearCart();
+
+        // 提示用戶並跳轉到訂單頁面
+        alert('Order created successfully!');
+        this.$router.push({ name: 'Orders' });
+      } catch (error) {
+        console.error('Failed to create order:', error);
+        alert('Failed to create order. Please try again.');
+      }
     },
-  };
-  </script>
+    // 前往購物車頁面
+    goToCart() {
+      this.$router.push({ name: 'Cart' });
+    },
+  },
+};
+</script>
   
   <style scoped>
   .checkout-page {

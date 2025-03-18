@@ -17,6 +17,10 @@ export default {
   getOrders() {
     return api.get('/orders');
   },
+  // 添加創建訂單的方法
+  createOrder(data) {
+    return api.post('/orders', data);
+  },
   cancelOrder(orderId) {
     return api.delete(`/orders/${orderId}`);
   },
@@ -108,5 +112,4 @@ export default {
   updateCategory(categoryId, data) {
     return api.put(`/admin/categories/${categoryId}`, data); // 確保路徑和後端一致
   },
-
 };

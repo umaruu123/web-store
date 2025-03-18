@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 
 // 這裡放所有 API 路由
 Route::get('/products', [ProductController::class, 'index']);
@@ -45,4 +46,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cart/add', [CartController::class, 'addToCart']);
     Route::delete('/cart/remove/{productId}', [CartController::class, 'removeFromCart']);
     Route::delete('/cart/clear', [CartController::class, 'clearCart']);
+
+    Route::post('/orders', [OrderController::class, 'createOrder']); // 創建訂單
+    Route::get('/orders', [OrderController::class, 'getOrders']); // 獲取訂單列表
+    Route::delete('/orders/{orderId}', [OrderController::class, 'cancelOrder']); // 取消訂單
 });
