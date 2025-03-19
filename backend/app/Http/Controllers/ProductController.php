@@ -11,9 +11,19 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $products = Product::with('category')->get(); // 加載關聯的類別
+        $searchQuery = $request->query('search');
+
+        if ($searchQuery) {
+            $products = Product::where('name', 'like', '%' . $searchQuery . '%')
+                ->orWhere('description', 'like', '%' . $searchQuery . '%')
+                ->with('category')
+                ->get();
+        } else {
+            $products = Product::with('category')->get();
+        }
+
         return response()->json($products);
     }
 

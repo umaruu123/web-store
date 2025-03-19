@@ -22,10 +22,19 @@
             placeholder="Search"
             class="search-input"
             v-model="searchQuery"
-            @keyup.enter="handleSearch"
+            @input="handleSearch"
             @blur="hideSearch"
             :class="{ 'hidden-mobile': isMobile && !showSearchBar }"
           />
+          <!-- 搜索結果 -->
+          <div v-if="searchResults.length > 0" class="search-results">
+            <ul>
+              <li v-for="product in searchResults" :key="product.id" @click="goToProduct(product.id)">
+                <img :src="product.image_url" :alt="product.name" class="search-result-image" />
+                <span class="search-result-name">{{ product.name }}</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -85,12 +94,14 @@
 import { useUserStore } from '@/stores/userStore'; // 引入用戶 Store
 import { useCartStore } from '@/stores/cartStore'; // 引入購物車 Store
 import { mapState } from 'pinia';
+import axios from 'axios';
 
 export default {
   name: 'Header',
   data() {
     return {
       searchQuery: '',
+      searchResults: [],
       menuOpen: false,
       showSearchBar: false,
       isMobile: window.innerWidth < 1280,
@@ -112,9 +123,16 @@ export default {
   },
   methods: {
     // 處理搜索
-    handleSearch() {
+    async handleSearch() {
       if (this.searchQuery.trim()) {
-        console.log('Searching for:', this.searchQuery);
+        try {
+          const response = await axios.get(`http://127.0.0.1:8000/api/products?search=${this.searchQuery}`);
+          this.searchResults = response.data;
+        } catch (error) {
+          console.error('Search failed:', error);
+        }
+      } else {
+        this.searchResults = [];
       }
     },
     // 隱藏搜索欄
@@ -130,6 +148,11 @@ export default {
     // 跳轉到購物車頁面
     goToCart() {
       this.$router.push({ name: 'Cart' });
+    },
+    // 跳轉到產品詳情頁面
+    goToProduct(productId) {
+      this.$router.push({ name: 'ProductDetails', params: { id: productId } });
+      this.searchResults = []; // 清空搜索結果
     },
   },
   async mounted() {
@@ -236,6 +259,49 @@ export default {
   border-radius: 4px;
   width: 200px;
   transition: width 0.3s ease;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-results ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-results li {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-results li:hover {
+  background-color: #f0f0f0;
+}
+
+.search-result-image {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  border-radius: 4px;
+}
+
+.search-result-name {
+  font-size: 14px;
+  color: #333;
 }
 
 /* 預設隱藏 search bar（小螢幕） */
