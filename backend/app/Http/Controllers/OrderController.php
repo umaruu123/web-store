@@ -128,6 +128,7 @@ class OrderController extends Controller
             'items' => $order->items->map(function ($item) {
                 return [
                     'product_name' => $item->product ? $item->product->name : 'Unknown Product',
+                    'product_image' => $item->product ? $item->product->image_url : null, // 確保返回 product_image
                     'quantity' => $item->quantity ?? 0,
                     'price' => $item->price ?? 0,
                 ];
