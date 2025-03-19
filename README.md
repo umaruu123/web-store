@@ -15,7 +15,7 @@ Built with **Vue.js** (frontend) and **Laravel** (backend), this website allows 
 ✔️ **User Profile Management:** Edit account details & track orders  
 ✔️ **Modern UI:** Responsive design with Parallax effects and Product Carousel  
 
-🔑 Admin Access
+## 🔑 Admin Access
 To access the Admin Dashboard, you need to create an account and set its role to admin manually in the database.
 
 1️⃣ Register a new account through the website.
