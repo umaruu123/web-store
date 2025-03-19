@@ -8,11 +8,7 @@ import AccountDetails from '@/views/AccountDetails.vue';
 import Orders from '@/views/Orders.vue';
 import Addresses from '@/views/Addresses.vue';
 import Wishlists from '@/views/Wishlists.vue';
-import RecentlyViewed from '@/views/RecentlyViewed.vue';
 import AdminDashboard from '@/views/AdminDashboard.vue';
-import AdminUsers from '@/views/AdminUsers.vue';
-import AdminOrders from '@/views/AdminOrders.vue';
-import AdminProducts from '@/views/AdminProducts.vue';
 import AnimalsPage from "@/views/AnimalsPage.vue";
 import BagsChairsPage from "@/views/BagsChairsPage.vue";
 import BabyBooksPage from "@/views/BabyBooksPage.vue";
@@ -79,28 +75,15 @@ const router = createRouter({
       meta: { requiresAuth: true }, // 需要登錄
     },
     {
-      path: '/orders/:id', // 動態路由，:id 是訂單 ID
-      name: 'OrderDetails', // 路由名稱
-      component: OrderDetails, // 對應的組件
-      props: true, // 將路由參數作為 props 傳遞給組件
-    },
-    {
       path: '/account/addresses',
       name: 'Addresses',
       component: Addresses,
       meta: { requiresAuth: true }, // 需要登錄
     },
-    
     {
       path: '/account/wishlists',
       name: 'Wishlists',
       component: Wishlists,
-      meta: { requiresAuth: true }, // 需要登錄
-    },
-    {
-      path: '/account/recently-viewed',
-      name: 'RecentlyViewed',
-      component: RecentlyViewed,
       meta: { requiresAuth: true }, // 需要登錄
     },
     {
@@ -109,20 +92,46 @@ const router = createRouter({
       component: () => import('@/views/Cart.vue'),
     },
     {
-      path: '/admin',
-      component: AdminDashboard,
-      meta: { requiresAuth: true, hideHeader: true }, // 需要登錄
-      children: [
-        { path: 'users', component: AdminUsers },
-        { path: 'orders', component: AdminOrders },
-        { path: 'products', component: AdminProducts },
-      ],
-    },
-    {
       path: '/product/:id',
       name: 'ProductDetails',
       component: () => import('../views/ProductDetails.vue'),
       meta: { requiresAuth: false }, // 不需要登錄
+    },
+    {
+      path: '/orders/:id', // 動態路由，:id 是訂單 ID
+      name: 'OrderDetails', // 路由名稱
+      component: OrderDetails, // 對應的組件
+      props: true, // 將路由參數作為 props 傳遞給組件
+    },
+    {
+      path: '/admin',
+      component: AdminDashboard,
+      meta: { requiresAuth: true, hideHeader: true }, // 需要登錄
+      children: [
+        {
+          path: 'users',
+          component: () => import('@/views/AdminUsers.vue'),
+        },
+        {
+          path: 'orders',
+          name: 'AdminOrders', // 確保路由名稱是 'AdminOrders'
+          component: () => import('@/views/AdminOrders.vue'),
+        },
+        {
+          path: 'orders/:id',
+          name: 'AdminOrderDetails',
+          component: () => import('@/views/AdminOrderDetails.vue'),
+        },
+        {
+          path: 'orders/:id/update-status',
+          name: 'AdminUpdateOrderStatus',
+          component: () => import('@/views/AdminUpdateOrderStatus.vue'),
+        },
+        {
+          path: 'products',
+          component: () => import('@/views/AdminProducts.vue'),
+        },
+      ],
     },
   ],
 });

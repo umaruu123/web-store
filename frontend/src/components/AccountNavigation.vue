@@ -7,7 +7,6 @@
       <span @click="navigateTo('Orders')" class="option">Orders</span>
       <span @click="navigateTo('Addresses')" class="option">Addresses</span>
       <span @click="navigateTo('Wishlists')" class="option">Wishlists</span>
-      <span @click="navigateTo('RecentlyViewed')" class="option">Recently Viewed</span>
       <span @click="navigateTo('AccountDetails')" class="option">Account Details</span>
       <span @click="logout" class="option">Log Out</span>
     </div>

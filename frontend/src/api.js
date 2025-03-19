@@ -14,21 +14,15 @@ api.interceptors.request.use((config) => {
 });
 
 export default {
-  getOrders() {
-    return api.get('/orders');
+  // 用戶相關 API
+  getUserDetails() {
+    return api.get('/user/details');
   },
-  getOrderDetails(orderId) {
-    return api.get(`/orders/${orderId}`);
+  updateUserDetails(data) {
+    return api.put('/user/details', data);
   },
-  cancelOrder(orderId) {
-    return api.delete(`/orders/${orderId}`);
-  },
-  // 添加創建訂單的方法
-  createOrder(data) {
-    return api.post('/orders', data);
-  },
-  cancelOrder(orderId) {
-    return api.delete(`/orders/${orderId}`);
+  changePassword(data) {
+    return api.post('/user/change-password', data);
   },
   getAddresses() {
     return api.get('/addresses');
@@ -39,83 +33,103 @@ export default {
   deleteAddress(addressId) {
     return api.delete(`/addresses/${addressId}`);
   },
-  getWishlist() {
-    return api.get('/wishlist');
-  },
-  removeFromWishlist(itemId) {
-    return api.delete(`/wishlist/${itemId}`);
-  },
-  addToCart(itemId) {
-    return api.post('/cart', { itemId });
-  },
-  getRecentlyViewed() {
-    return api.get('/recently-viewed');
-  },
-  addToWishlist(itemId) {
-    return api.post('/wishlist', { itemId });
-  },
-  getUserDetails() {
-    return api.get('/user/details');
-  },
-  updateUserDetails(data) {
-    return api.put('/user/details', data);
-  },
-  changePassword(data) {
-    return api.post('/user/change-password', data);
-  },
   updateAddress(data) {
     return api.put('/user/update-address', data);
   },
-  // 獲取所有用戶
+
+  // 購物車相關 API
+  getCart() {
+    return api.get('/cart');
+  },
+  addToCart(itemId) {
+    return api.post('/cart/add', { itemId });
+  },
+  removeFromCart(productId) {
+    return api.delete(`/cart/remove/${productId}`);
+  },
+  clearCart() {
+    return api.delete('/cart/clear');
+  },
+
+  // 用戶訂單相關 API
+  getOrders() {
+    return api.get('/orders');
+  },
+  getOrderDetails(orderId) {
+    return api.get(`/orders/${orderId}`);
+  },
+  createOrder(data) {
+    return api.post('/orders', data);
+  },
+  cancelOrder(orderId) {
+    return api.delete(`/orders/${orderId}`);
+  },
+
+  // 管理員相關 API
+  // 用戶管理
   getUsers() {
     return api.get('/admin/users');
   },
   addUser(data) {
-    return api.post('/admin/users', data); // 確保路徑和後端一致
-  },
-  // 刪除用戶
-  deleteUser(userId) {
-    return api.delete(`/admin/users/${userId}`);
+    return api.post('/admin/users', data);
   },
   updateUserByAdmin(userId, data) {
     return api.put(`/admin/users/${userId}`, data);
   },
-  // 獲取所有產品
+  deleteUser(userId) {
+    return api.delete(`/admin/users/${userId}`);
+  },
+
+  // 產品管理
   getProducts() {
     return api.get('/admin/products');
   },
-  // 獲取所有類別
-  getCategories() {
-    return api.get('/categories');
-  },
-  // 添加產品
   addProduct(data) {
     return api.post('/admin/products', data);
   },
-  // 更新產品
-  updateProduct(productId, data) {  
+  updateProduct(productId, data) {
     return api.put(`/admin/products/${productId}`, data);
   },
-  // 刪除產品
   deleteProduct(productId) {
     return api.delete(`/admin/products/${productId}`);
   },
-  // 獲取所有訂單
-  getAdminOrders() {
-    return api.get('/admin/orders');
+
+  // 類別管理
+  getCategories() {
+    return api.get('/categories');
   },
-  // 更新訂單狀態
-  updateOrderStatus(orderId, status) {
-    return api.put(`/admin/orders/${orderId}/status`, { status });
+  addCategory(data) {
+    return api.post('/admin/categories', data);
   },
-  // 刪除類別
+  updateCategory(categoryId, data) {
+    return api.put(`/admin/categories/${categoryId}`, data);
+  },
   deleteCategory(categoryId) {
     return api.delete(`/admin/categories/${categoryId}`);
   },
-  addCategory(data) {
-    return api.post('/admin/categories', data); // 確保路徑和後端一致
+
+  // 訂單管理
+  getAdminOrders() {
+    return api.get('/admin/orders');
   },
-  updateCategory(categoryId, data) {
-    return api.put(`/admin/categories/${categoryId}`, data); // 確保路徑和後端一致
+  getAdminOrderDetails(orderId) {
+    return api.get(`/admin/orders/${orderId}`);
+  },
+  updateOrderStatus(orderId, status) {
+    return api.put(`/admin/orders/${orderId}/status`, { status });
+  },
+
+  // 其他 API
+  getWishlist() {
+    return api.get('/wishlist');
+  },
+  addToWishlist(itemId) {
+    return api.post('/wishlist', { itemId });
+  },
+  removeFromWishlist(itemId) {
+    return api.delete(`/wishlist/${itemId}`);
+  },
+  getRecentlyViewed() {
+    return api.get('/recently-viewed');
   },
 };

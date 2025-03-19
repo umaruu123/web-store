@@ -67,6 +67,7 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order created successfully!', 'order' => $order], 201);
     }
 
+    // 獲取用戶訂單列表
     public function getOrders(Request $request)
     {
         $user = $request->user();
@@ -80,14 +81,14 @@ class OrderController extends Controller
         $formattedOrders = $orders->map(function ($order) {
             return [
                 'id' => $order->id,
-                'created_at' => $order->created_at,
-                'total_amount' => $order->total_amount,
-                'status' => $order->status,
+                'created_at' => $order->created_at ? $order->created_at->toDateTimeString() : 'N/A',
+                'total_amount' => $order->total_amount ?? 0,
+                'status' => $order->status ?? 'Unknown Status',
                 'items' => $order->items->map(function ($item) {
                     return [
-                        'product_name' => $item->product->name,
-                        'quantity' => $item->quantity,
-                        'price' => $item->price,
+                        'product_name' => $item->product ? $item->product->name : 'Unknown Product',
+                        'quantity' => $item->quantity ?? 0,
+                        'price' => $item->price ?? 0,
                     ];
                 }),
             ];
@@ -95,37 +96,141 @@ class OrderController extends Controller
 
         return response()->json($formattedOrders);
     }
-    public function getOrderDetails($orderId)
-        {
-            $user = Auth::user();
 
-            // 獲取訂單詳情，並加載 items 和 items.product
-            $order = Order::where('id', $orderId)
-                ->where('user_id', $user->id)
-                ->with('items.product') // 加載 items 和 items.product
-                ->first();
+    // 獲取用戶訂單詳情
+    public function getOrderDetails($orderId)
+    {
+        $user = Auth::user();
+
+        // 獲取訂單詳情，並加載 items 和 items.product
+        $order = Order::where('id', $orderId)
+            ->where('user_id', $user->id)
+            ->with('items.product')
+            ->first();
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // 格式化訂單數據
+        $formattedOrder = [
+            'id' => $order->id,
+            'created_at' => $order->created_at ? $order->created_at->toDateTimeString() : 'N/A',
+            'total_amount' => $order->total_amount ?? 0,
+            'status' => $order->status ?? 'Unknown Status',
+            'items' => $order->items->map(function ($item) {
+                return [
+                    'product_name' => $item->product ? $item->product->name : 'Unknown Product',
+                    'quantity' => $item->quantity ?? 0,
+                    'price' => $item->price ?? 0,
+                ];
+            }),
+        ];
+
+        return response()->json($formattedOrder);
+    }
+
+    // 取消訂單
+    public function cancelOrder($orderId)
+    {
+        $user = Auth::user();
+
+        // 獲取訂單
+        $order = Order::where('id', $orderId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // 取消訂單
+        $order->status = 'cancelled';
+        $order->save();
+
+        return response()->json(['message' => 'Order cancelled successfully']);
+    }
+
+    // 獲取所有訂單（管理員用）
+    public function getAdminOrders(Request $request)
+    {
+        $orders = Order::with(['user', 'items.product'])
+            ->get();
+
+        $formattedOrders = $orders->map(function ($order) {
+            return [
+                'id' => $order->id,
+                'customer' => $order->user ? $order->user->first_name . ' ' . $order->user->last_name : 'Unknown Customer',
+                'date' => $order->created_at ? $order->created_at->toDateTimeString() : 'N/A',
+                'total' => $order->total_amount ?? 0,
+                'status' => $order->status ?? 'Unknown Status',
+                'items' => $order->items->map(function ($item) {
+                    return [
+                        'product_name' => $item->product ? $item->product->name : 'Unknown Product',
+                        'quantity' => $item->quantity ?? 0,
+                        'price' => $item->price ?? 0,
+                    ];
+                }),
+            ];
+        });
+
+        return response()->json($formattedOrders);
+    }
+
+    // 獲取訂單詳情（管理員用）
+    public function getAdminOrderDetails($orderId)
+    {
+        $order = Order::with(['user', 'items.product'])->find($orderId);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        $formattedOrder = [
+            'id' => $order->id,
+            'customer' => $order->user ? $order->user->first_name . ' ' . $order->user->last_name : 'Unknown Customer',
+            'date' => $order->created_at ? $order->created_at->toDateTimeString() : 'N/A',
+            'total' => $order->total_amount ?? 0,
+            'status' => $order->status ?? 'Unknown Status',
+            'items' => $order->items->map(function ($item) {
+                return [
+                    'product_name' => $item->product ? $item->product->name : 'Unknown Product',
+                    'quantity' => $item->quantity ?? 0,
+                    'price' => $item->price ?? 0,
+                ];
+            }),
+        ];
+
+        return response()->json($formattedOrder);
+    }
+
+    // 更新訂單狀態（管理員用）
+    public function updateOrderStatus(Request $request, $orderId)
+    {
+        try {
+            // 查找訂單
+            $order = Order::find($orderId);
 
             if (!$order) {
                 return response()->json(['message' => 'Order not found'], 404);
             }
 
-            // 格式化訂單數據
-            $formattedOrder = [
-                'id' => $order->id,
-                'created_at' => $order->created_at,
-                'total_amount' => $order->total_amount,
-                'status' => $order->status,
-                'items' => $order->items->map(function ($item) {
-                    return [
-                        'product_id' => $item->product_id,
-                        'product_name' => $item->product ? $item->product->name : 'Unknown Product',
-                        'product_image' => $item->product ? $item->product->image_url : '', // 新增圖片 URL
-                        'quantity' => $item->quantity,
-                        'price' => $item->price,
-                    ];
-                }),
-            ];
+            // 驗證狀態值
+            $status = $request->input('status');
+            $allowedStatuses = ['pending', 'completed', 'cancelled', 'shipped', 'delivered'];
 
-            return response()->json($formattedOrder);
+            if (!in_array($status, $allowedStatuses)) {
+                return response()->json(['message' => 'Invalid status'], 400);
+            }
+
+            // 更新訂單狀態
+            $order->status = $status;
+            $order->save();
+
+            return response()->json(['message' => 'Order status updated successfully']);
+        } catch (\Exception $e) {
+            // 捕獲異常並返回錯誤信息
+            return response()->json(['message' => 'Failed to update order status', 'error' => $e->getMessage()], 500);
         }
+    }
 }
