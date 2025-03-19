@@ -41,11 +41,21 @@
       <!-- 中間的導航欄 -->
       <nav :class="['nav', { 'nav-open': menuOpen }]">
         <ul class="nav-list">
-          <li class="nav-item"><a href="#">Home</a></li>
-          <li class="nav-item"><a href="#">EXPLORE ALL</a></li>
-          <li class="nav-item"><a href="#">ANIMALS</a></li>
-          <li class="nav-item"><a href="#">BAGS & CHAIRS</a></li>
-          <li class="nav-item"><a href="#">BABY & BOOKS</a></li>
+          <li class="nav-item">
+            <router-link to="/">Home</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/explore-all">EXPLORE ALL</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/animals">ANIMALS</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/bags-chairs">BAGS & CHAIRS</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/baby-books">BABY & BOOKS</router-link>
+          </li>
         </ul>
       </nav>
 

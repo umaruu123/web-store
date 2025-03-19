@@ -13,6 +13,7 @@ import AnimalsPage from "@/views/AnimalsPage.vue";
 import BagsChairsPage from "@/views/BagsChairsPage.vue";
 import BabyBooksPage from "@/views/BabyBooksPage.vue";
 import OrderDetails from '@/views/OrderDetails.vue'; // 導入 OrderDetails 組件
+import ExploreAllPage from '@/views/ExploreAllPage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: () => import('../views/AboutView.vue'),
+    },
+    {
+      path: '/explore-all',
+      name: 'ExploreAll',
+      component: ExploreAllPage,
     },
     {
       path: "/animals",

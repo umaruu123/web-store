@@ -1,7 +1,6 @@
 <template>
   <div class="baby-books-page">
     <h1>BABY & BOOKS Collection</h1>
-    <p>Explore our adorable baby and books collection!</p>
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else class="product-list">
@@ -64,11 +63,6 @@ h1 {
   margin-bottom: 1rem;
 }
 
-p {
-  font-size: 1.2rem;
-  color: #555;
-  margin-bottom: 2rem;
-}
 
 .product-list {
   display: grid;
