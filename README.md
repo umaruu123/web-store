@@ -1,4 +1,4 @@
-![{CA29908A-0F12-46EB-ACAB-44F400DC5F8F}](https://github.com/user-attachments/assets/36686298-bcfe-4a77-83e9-c4d44e74a86c)# 🛒 Store Website
+# 🛒 Store Website
 
 A modern e-commerce platform inspired by Jellycat, designed with a smooth shopping experience in mind.  
 Built with **Vue.js** (frontend) and **Laravel** (backend), this website allows users to browse products, manage accounts, and place orders seamlessly.
