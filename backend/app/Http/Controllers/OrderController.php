@@ -54,8 +54,15 @@ class OrderController extends Controller
             ]);
 
             // 更新庫存
-            $cartItem->product->stock -= $cartItem->quantity;
-            $cartItem->product->save();
+            $product = $cartItem->product;
+            $product->stock -= $cartItem->quantity;
+
+            // 如果庫存為 0，設置狀態為 Out of stock
+            if ($product->stock <= 0) {
+                $product->status = 'out_of_stock';
+            }
+
+            $product->save();
         }
 
         // 清空購物車
@@ -138,13 +145,32 @@ class OrderController extends Controller
         // 獲取訂單
         $order = Order::where('id', $orderId)
             ->where('user_id', $user->id)
+            ->with('items.product') // 加載訂單商品及其關聯的產品
             ->first();
 
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        // 取消訂單
+        // 檢查訂單是否已經取消
+        if ($order->status === 'cancelled') {
+            return response()->json(['message' => 'Order is already cancelled'], 400);
+        }
+
+        // 恢復庫存
+        foreach ($order->items as $item) {
+            $product = $item->product;
+            $product->stock += $item->quantity;
+
+            // 如果庫存從 0 變為大於 0，更新狀態為 active
+            if ($product->stock > 0 && $product->status === 'out_of_stock') {
+                $product->status = 'active';
+            }
+
+            $product->save();
+        }
+
+        // 更新訂單狀態為 cancelled
         $order->status = 'cancelled';
         $order->save();
 

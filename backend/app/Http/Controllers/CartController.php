@@ -36,6 +36,11 @@ class CartController extends Controller
             return response()->json(['message' => 'Product not found'], 404);
         }
 
+        // 檢查庫存是否足夠
+        if ($product->stock < $quantity) {
+            return response()->json(['message' => 'Insufficient stock for product: ' . $product->name], 400);
+        }
+
         // 檢查購物車中是否已經有該商品
         $cartItem = Cart::where('user_id', $user->id)
             ->where('product_id', $productId)

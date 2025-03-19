@@ -157,23 +157,23 @@ export default {
   },
   methods: {
     async submitPayment() {
-      try {
-        // 調用後端 API 創建訂單
-        const response = await api.createOrder({
-          paymentDetails: this.paymentDetails, // 傳遞付款信息
-        });
+        try {
+            // 調用後端 API 創建訂單
+            const response = await api.createOrder({
+                paymentDetails: this.paymentDetails, // 傳遞付款信息
+            });
 
-        // 訂單創建成功後，清空購物車
-        const cartStore = useCartStore();
-        await cartStore.clearCart();
+            // 訂單創建成功後，清空購物車
+            const cartStore = useCartStore();
+            await cartStore.clearCart();
 
-        // 提示用戶並跳轉到訂單頁面
-        alert('Order created successfully!');
-        this.$router.push({ name: 'Orders' });
-      } catch (error) {
-        console.error('Failed to create order:', error);
-        alert('Failed to create order. Please try again.');
-      }
+            // 提示用戶並跳轉到訂單頁面
+            alert('Order created successfully!');
+            this.$router.push({ name: 'Orders' });
+        } catch (error) {
+            console.error('Failed to create order:', error);
+            alert(error.response?.data?.message || 'Failed to create order. Please try again.');
+        }
     },
     // 前往購物車頁面
     goToCart() {

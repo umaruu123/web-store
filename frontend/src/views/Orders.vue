@@ -93,6 +93,7 @@ export default {
         fetchOrders(); // 重新加載訂單列表
       } catch (error) {
         console.error('Failed to cancel order:', error);
+        alert(error.response?.data?.message || 'Failed to cancel order. Please try again.');
       }
     };
 

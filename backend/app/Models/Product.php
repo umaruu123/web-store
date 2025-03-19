@@ -17,6 +17,10 @@ class Product extends Model
         'sku',
     ];
 
+    protected $casts = [
+        'status' => 'string', // 確保 status 是字符串類型
+    ];
+
     public function category()
     {
         return $this->belongsTo(Category::class);
