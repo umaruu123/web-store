@@ -16,12 +16,15 @@ Built with **Vue.js** (frontend) and **Laravel** (backend), this website allows 
 ✔️ **Modern UI:** Responsive design with Parallax effects and Product Carousel  
 
 ## 🔑 Admin Access
-To access the Admin Dashboard, you need to create an account and set its role to admin manually in the database.
+To access the **Admin Dashboard**, you need to create an account and set its role to `admin` manually in the database.
 
-1️⃣ Register a new account through the website.
-2️⃣ Open your MySQL database (e.g., using phpMyAdmin or MySQL CLI).
-3️⃣ Find the users table and set your account's role field to "admin".
-4️⃣ Now you can log in and access the Admin Dashboard! 🎉
+1️⃣ **Register a new account** through the website.  
+
+2️⃣ **Open your MySQL database** (e.g., using phpMyAdmin or MySQL CLI).  
+
+3️⃣ **Find the `users` table** and set your account's `role` field to `"admin"`.  
+
+4️⃣ **Now you can log in and access the Admin Dashboard!** 🎉  
 
 ## 📸 Screenshots
 ![{F23F957D-153C-496C-A309-921EC4AD0AA9}](https://github.com/user-attachments/assets/233b9fa5-b170-4c2d-b90b-c0e4c4199782)
