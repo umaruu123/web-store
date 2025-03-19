@@ -1,11 +1,22 @@
 <template>
   <div class="animals-page">
-    <h1>ANIMALS Collection</h1>
+    <h1>Animals</h1>
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else class="product-list">
-      <div v-for="product in products" :key="product.id" class="product-card" @click="viewProductDetails(product.id)">
-        <img :src="product.image_url" :alt="product.name" class="product-image" />
+      <div
+        v-for="product in products"
+        :key="product.id"
+        class="product-card"
+        @click="viewProductDetails(product.id)"
+      >
+        <div class="product-image-container">
+          <img :src="product.image_url" :alt="product.name" class="product-image" />
+          <!-- 顯示庫存狀態 -->
+          <div :class="['stock-status', product.stock > 0 ? 'in-stock' : 'out-of-stock']">
+            {{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}
+          </div>
+        </div>
         <h3 class="product-name">{{ product.name }}</h3>
         <p class="product-price">RM{{ product.price.toFixed(2) }}</p>
       </div>
@@ -50,27 +61,23 @@ export default {
 
 <style scoped>
 .animals-page {
-  padding: 2rem;
-  text-align: center;
-  max-width: 100%; /* 接近全宽 */
+  padding: 100px 20px 20px; /* 添加 padding-top 避免被 Header 覆蓋 */
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 32px;
   color: #333;
-  margin-bottom: 1rem;
 }
-
 
 .product-list {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 每行 4 个产品 */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
   padding: 20px;
-  max-width: 100%; /* 接近全宽 */
-  margin: 0 auto;
 }
 
 .product-card {
@@ -80,9 +87,7 @@ h1 {
   overflow: hidden;
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  position: relative; /* 讓 stock-status 可以定位 */
 }
 
 .product-card:hover {
@@ -90,66 +95,61 @@ h1 {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
+.product-image-container {
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  position: relative; /* 讓 stock-status 可以定位 */
+}
+
 .product-image {
   width: 100%;
-  height: 400px; /* 增大图片高度 */
+  height: 250px;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
 .product-card:hover .product-image {
-  transform: scale(1.05); /* 悬停时图片放大 */
+  transform: scale(1.1);
 }
 
 .product-name {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin: 10px 0;
+  font-size: 18px;
+  font-weight: 600;
   color: #333;
+  margin: 16px 0 8px;
 }
 
 .product-price {
-  font-size: 1.1rem;
+  font-size: 16px;
   color: #28a745;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+}
+
+.stock-status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  z-index: 1; /* 確保 stock-status 顯示在圖片上方 */
+}
+
+.stock-status.in-stock {
+  background-color: #28a745; /* 綠色 */
+}
+
+.stock-status.out-of-stock {
+  background-color: #dc3545; /* 紅色 */
 }
 
 .loading,
 .error {
-  font-size: 1.2rem;
+  font-size: 18px;
   color: #333;
   margin-top: 20px;
-}
-
-/* 响应式设计 */
-@media (max-width: 1024px) {
-  .product-list {
-    grid-template-columns: repeat(3, 1fr); /* 每行 3 个产品 */
-  }
-
-  .product-image {
-    height: 250px; /* 调整图片高度 */
-  }
-}
-
-@media (max-width: 768px) {
-  .product-list {
-    grid-template-columns: repeat(2, 1fr); /* 每行 2 个产品 */
-  }
-
-  .product-image {
-    height: 200px; /* 调整图片高度 */
-  }
-}
-
-@media (max-width: 480px) {
-  .product-list {
-    grid-template-columns: 1fr; /* 每行 1 个产品 */
-  }
-
-  .product-image {
-    height: 250px; /* 调整图片高度 */
-  }
 }
 </style>

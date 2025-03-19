@@ -13,8 +13,14 @@
         <button class="wishlist-button" @click="addToWishlist(product.id)">
           Add to Wishlist
         </button>
-        <button class="cart-button" @click="addToCart(product)">
-          Add to Cart
+        <!-- 根據庫存狀態禁用 Add to Cart 按鈕 -->
+        <button
+          class="cart-button"
+          :class="{ disabled: product.stock <= 0 }"
+          @click="addToCart(product)"
+          :disabled="product.stock <= 0"
+        >
+          {{ product.stock > 0 ? 'Add to Cart' : 'Out of Stock' }}
         </button>
       </div>
     </div>
@@ -166,5 +172,13 @@ export default {
     font-size: 1.2rem;
     color: #333;
     margin-top: 20px;
+  }
+  .cart-button.disabled {
+    background-color: #ccc; /* 灰色 */
+    cursor: not-allowed;
+  }
+
+  .cart-button.disabled:hover {
+    background-color: #ccc; /* 保持灰色 */
   }
   </style>

@@ -19,6 +19,10 @@
           >
             <div class="product-image-container">
               <img :src="product.image_url" :alt="product.name" class="product-image" />
+              <!-- 顯示庫存狀態 -->
+              <div :class="['stock-status', product.stock > 0 ? 'in-stock' : 'out-of-stock']">
+                {{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}
+              </div>
             </div>
             <h3 class="product-name">{{ product.name }}</h3>
             <p class="product-price">RM{{ product.price.toFixed(2) }}</p>
@@ -159,6 +163,7 @@ export default {
   overflow: hidden;
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative; /* 讓 stock-status 可以定位 */
 }
 
 .product-card:hover {
@@ -169,6 +174,7 @@ export default {
 .product-image-container {
   overflow: hidden;
   border-radius: 12px 12px 0 0;
+  position: relative; /* 讓 stock-status 可以定位 */
 }
 
 .product-image {
@@ -235,6 +241,26 @@ export default {
   font-size: 18px;
   color: #333;
   margin-top: 20px;
+}
+
+.stock-status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  z-index: 1; /* 確保 stock-status 顯示在圖片上方 */
+}
+
+.stock-status.in-stock {
+  background-color: #28a745; /* 綠色 */
+}
+
+.stock-status.out-of-stock {
+  background-color: #dc3545; /* 紅色 */
 }
 
 @media (max-width: 1024px) {
