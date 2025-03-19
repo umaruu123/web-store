@@ -16,6 +16,7 @@ import AdminProducts from '@/views/AdminProducts.vue';
 import AnimalsPage from "@/views/AnimalsPage.vue";
 import BagsChairsPage from "@/views/BagsChairsPage.vue";
 import BabyBooksPage from "@/views/BabyBooksPage.vue";
+import OrderDetails from '@/views/OrderDetails.vue'; // 導入 OrderDetails 組件
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -78,11 +79,18 @@ const router = createRouter({
       meta: { requiresAuth: true }, // 需要登錄
     },
     {
+      path: '/orders/:id', // 動態路由，:id 是訂單 ID
+      name: 'OrderDetails', // 路由名稱
+      component: OrderDetails, // 對應的組件
+      props: true, // 將路由參數作為 props 傳遞給組件
+    },
+    {
       path: '/account/addresses',
       name: 'Addresses',
       component: Addresses,
       meta: { requiresAuth: true }, // 需要登錄
     },
+    
     {
       path: '/account/wishlists',
       name: 'Wishlists',

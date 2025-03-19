@@ -17,6 +17,12 @@ export default {
   getOrders() {
     return api.get('/orders');
   },
+  getOrderDetails(orderId) {
+    return api.get(`/orders/${orderId}`);
+  },
+  cancelOrder(orderId) {
+    return api.delete(`/orders/${orderId}`);
+  },
   // 添加創建訂單的方法
   createOrder(data) {
     return api.post('/orders', data);

@@ -49,5 +49,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/orders', [OrderController::class, 'createOrder']); // 創建訂單
     Route::get('/orders', [OrderController::class, 'getOrders']); // 獲取訂單列表
+    Route::get('/orders/{orderId}', [OrderController::class, 'getOrderDetails']); // 獲取訂單詳情
     Route::delete('/orders/{orderId}', [OrderController::class, 'cancelOrder']); // 取消訂單
 });

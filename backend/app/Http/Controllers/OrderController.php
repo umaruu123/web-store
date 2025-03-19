@@ -95,4 +95,37 @@ class OrderController extends Controller
 
         return response()->json($formattedOrders);
     }
+    public function getOrderDetails($orderId)
+        {
+            $user = Auth::user();
+
+            // 獲取訂單詳情，並加載 items 和 items.product
+            $order = Order::where('id', $orderId)
+                ->where('user_id', $user->id)
+                ->with('items.product') // 加載 items 和 items.product
+                ->first();
+
+            if (!$order) {
+                return response()->json(['message' => 'Order not found'], 404);
+            }
+
+            // 格式化訂單數據
+            $formattedOrder = [
+                'id' => $order->id,
+                'created_at' => $order->created_at,
+                'total_amount' => $order->total_amount,
+                'status' => $order->status,
+                'items' => $order->items->map(function ($item) {
+                    return [
+                        'product_id' => $item->product_id,
+                        'product_name' => $item->product ? $item->product->name : 'Unknown Product',
+                        'product_image' => $item->product ? $item->product->image_url : '', // 新增圖片 URL
+                        'quantity' => $item->quantity,
+                        'price' => $item->price,
+                    ];
+                }),
+            ];
+
+            return response()->json($formattedOrder);
+        }
 }
