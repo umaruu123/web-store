@@ -13,11 +13,11 @@
       <div class="footer-section">
         <h3>Quick Links</h3>
         <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Explore All</a></li>
-          <li><a href="#">Animals</a></li>
-          <li><a href="#">Baby & Books</a></li>
-          <li><a href="#">Bag Charm</a></li>
+          <li><router-link to="/">Home</router-link></li>
+          <li><router-link to="/explore-all">Explore All</router-link></li>
+          <li><router-link to="/animals">Animals</router-link></li>
+          <li><router-link to="/baby-books">Baby & Books</router-link></li>
+          <li><router-link to="/bags-charms">Bags Charms</router-link></li>
         </ul>
       </div>
 
@@ -25,9 +25,9 @@
       <div class="footer-section">
         <h3>About</h3>
         <ul>
-          <li><a href="#">Our Story</a></li>
-          <li><a href="#">Why Us</a></li>
-          <li><a href="#">Press & PR</a></li>
+          <li><router-link to="/our-story">Our Story</router-link></li>
+          <li><router-link to="/why-us">Why Us</router-link></li>
+          <li><router-link to="/press-pr">Press & PR</router-link></li>
         </ul>
       </div>
     </div>

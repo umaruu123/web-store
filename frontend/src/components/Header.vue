@@ -51,7 +51,7 @@
             <router-link to="/animals">ANIMALS</router-link>
           </li>
           <li class="nav-item">
-            <router-link to="/bags-chairs">BAGS & CHAIRS</router-link>
+            <router-link to="/bags-charms">BAGS & CHAIMS</router-link>
           </li>
           <li class="nav-item">
             <router-link to="/baby-books">BABY & BOOKS</router-link>

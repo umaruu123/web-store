@@ -10,10 +10,13 @@ import Addresses from '@/views/Addresses.vue';
 import Wishlists from '@/views/Wishlists.vue';
 import AdminDashboard from '@/views/AdminDashboard.vue';
 import AnimalsPage from "@/views/AnimalsPage.vue";
-import BagsChairsPage from "@/views/BagsChairsPage.vue";
+import BagsCharmsPage from "@/views/BagsCharmsPage.vue";
 import BabyBooksPage from "@/views/BabyBooksPage.vue";
 import OrderDetails from '@/views/OrderDetails.vue'; // 導入 OrderDetails 組件
 import ExploreAllPage from '@/views/ExploreAllPage.vue';
+import OurStory from '@/views/OurStory.vue';
+import WhyUs from '@/views/WhyUs.vue';
+import PressPR from '@/views/PressPR.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,9 +27,19 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue'),
+      path: '/our-story',
+      name: 'OurStory',
+      component: OurStory,
+    },
+    {
+      path: '/why-us',
+      name: 'WhyUs',
+      component: WhyUs,
+    },
+    {
+      path: '/press-pr',
+      name: 'PressPR',
+      component: PressPR,
     },
     {
       path: '/explore-all',
@@ -38,8 +51,8 @@ const router = createRouter({
       component: AnimalsPage,
     },
     {
-      path: "/bags-chairs",
-      component: BagsChairsPage,
+      path: "/bags-charms",
+      component: BagsCharmsPage,
     },
     {
       path: "/baby-books",
