@@ -39,4 +39,37 @@ git clone https://github.com/umaruu123/store-website.git
 cd store-website
 
 
+2️⃣ Backend Setup (Laravel)
+cd backend
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan storage:link
+php artisan serve
+
+Frontend Setup (Vue.js)
+cd frontend
+npm install
+npm run dev
+
+🔧 Environment Variables
+Make sure to configure your .env file before running the backend. Here are the required variables:
+APP_NAME=StoreWebsite
+APP_ENV=local
+APP_KEY=your_app_key
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=store_website
+DB_USERNAME=root
+DB_PASSWORD=
+
+SANCTUM_STATEFUL_DOMAINS=localhost
+SESSION_DOMAIN=localhost
+
+Add this FRONTEND_URL=http://localhost:5173
 
