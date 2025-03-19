@@ -13,6 +13,7 @@
           <p><strong>Date:</strong> {{ order.date }}</p>
           <p><strong>Total:</strong> ${{ order.total }}</p>
           <p><strong>Status:</strong> <span :class="`status status-${order.status.toLowerCase()}`">{{ order.status }}</span></p>
+          <p><strong>Address:</strong> {{ order.address }}</p> <!-- 顯示地址信息 -->
         </div>
 
         <h3 class="items-title">Items</h3>

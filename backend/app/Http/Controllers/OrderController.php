@@ -186,12 +186,21 @@ class OrderController extends Controller
             return response()->json(['message' => 'Order not found'], 404);
         }
 
+        // 格式化地址
+        $address = $order->user ? 
+            $order->user->address1 . ', ' . 
+            $order->user->city . ', ' . 
+            $order->user->state . ' ' . 
+            $order->user->zip . ', ' . 
+            $order->user->country : 'No address provided';
+
         $formattedOrder = [
             'id' => $order->id,
             'customer' => $order->user ? $order->user->first_name . ' ' . $order->user->last_name : 'Unknown Customer',
             'date' => $order->created_at ? $order->created_at->toDateTimeString() : 'N/A',
             'total' => $order->total_amount ?? 0,
             'status' => $order->status ?? 'Unknown Status',
+            'address' => $address, // 添加格式化後的地址信息
             'items' => $order->items->map(function ($item) {
                 return [
                     'product_name' => $item->product ? $item->product->name : 'Unknown Product',
@@ -203,7 +212,6 @@ class OrderController extends Controller
 
         return response()->json($formattedOrder);
     }
-
     // 更新訂單狀態（管理員用）
     public function updateOrderStatus(Request $request, $orderId)
     {
