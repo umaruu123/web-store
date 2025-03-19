@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\WishlistController;
 
 // 這裡放所有 API 路由
 Route::get('/products', [ProductController::class, 'index']);
@@ -35,6 +36,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [OrderController::class, 'getOrders']); // 獲取用戶訂單列表
     Route::get('/orders/{orderId}', [OrderController::class, 'getOrderDetails']); // 獲取用戶訂單詳情
     Route::delete('/orders/{orderId}', [OrderController::class, 'cancelOrder']); // 取消訂單
+
+    // 願望清單相關路由
+    Route::get('/wishlist', [WishlistController::class, 'getWishlist']);
+    Route::post('/wishlist', [WishlistController::class, 'addToWishlist']);
+    Route::delete('/wishlist/{itemId}', [WishlistController::class, 'removeFromWishlist']);
 
     // 管理員相關路由
     Route::prefix('admin')->group(function () {

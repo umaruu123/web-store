@@ -28,10 +28,10 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { useUserStore } from '@/stores/userStore'; // 引入用戶 Store
 import { useCartStore } from '@/stores/cartStore'; // 引入購物車 Store
 import { mapState } from 'pinia';
+import api from '@/api'; // 引入 api.js
 
 export default {
   data() {
@@ -48,9 +48,8 @@ export default {
   async mounted() {
     const productId = this.$route.params.id;
     try {
-      const response = await axios.get(
-        `http://127.0.0.1:8000/api/products/${productId}/details`
-      );
+      // 使用 api.js 中的方法來獲取商品詳情
+      const response = await api.getProductDetails(productId); // 使用 api.js 的 getProductDetails 方法
       this.product = response.data;
       this.product.price = parseFloat(this.product.price);
     } catch (err) {
@@ -61,25 +60,35 @@ export default {
     }
   },
   methods: {
-  async addToCart(product) {
-    if (!this.user) {
-      // 如果用戶未登錄，跳轉到登錄頁面
-      this.$router.push({ name: 'login' });
-    } else {
-      // 如果用戶已登錄，調用後端 API 添加商品到購物車
+    async addToCart(product) {
+      if (!this.user) {
+        // 如果用戶未登錄，跳轉到登錄頁面
+        this.$router.push({ name: 'login' });
+        return;
+      }
+
+      // 檢查庫存
+      if (product.stock <= 0) {
+        alert('This product is out of stock and cannot be added to the cart.');
+        return;
+      }
+
+      // 如果商品有庫存，添加到購物車
       const cartStore = useCartStore();
       await cartStore.addItem(product);
       alert('Product added to cart!');
-    }
-  },
+    },
 
-    // 添加到願望清單
     async addToWishlist(productId) {
+      const userStore = useUserStore();
+      if (!userStore.user) {
+        // 如果用戶未登錄，跳轉到登錄頁面
+        this.$router.push({ name: 'login' });
+        return;
+      }
+
       try {
-        const response = await axios.post(
-          'http://127.0.0.1:8000/api/wishlist',
-          { itemId: productId }
-        );
+        const response = await api.addToWishlist(productId); // 使用 api.js 的 addToWishlist 方法
         alert('Product added to wishlist!');
         console.log('Wishlist response:', response.data);
       } catch (err) {

@@ -70,7 +70,7 @@
         </router-link>
 
         <!-- 其他圖標 -->
-        <a href="#" class="icon-link">
+        <a href="#" class="icon-link" @click.prevent="goToWishlist">
           <i class="fas fa-heart"></i>
         </a>
         <div class="cart-icon" @mouseenter="showCartPreview = true" @mouseleave="showCartPreview = false">
@@ -164,6 +164,16 @@ export default {
       this.$router.push({ name: 'ProductDetails', params: { id: productId } });
       this.searchResults = []; // 清空搜索結果
     },
+    goToWishlist() {
+    const userStore = useUserStore();
+    if (!userStore.user) {
+      // 如果用戶未登錄，跳轉到登錄頁面
+      this.$router.push({ name: 'login' });
+    } else {
+      // 如果用戶已登錄，跳轉到願望清單頁面
+      this.$router.push({ name: 'Wishlists' });
+    }
+  },
   },
   async mounted() {
     // 監聽窗口大小變化

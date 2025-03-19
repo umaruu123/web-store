@@ -13,6 +13,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// 導出所有 API 方法
 export default {
   // 用戶相關 API
   getUserDetails() {
@@ -131,5 +132,8 @@ export default {
   },
   getRecentlyViewed() {
     return api.get('/recently-viewed');
+  },
+  getProductDetails(productId) {
+    return api.get(`/products/${productId}/details`);
   },
 };
